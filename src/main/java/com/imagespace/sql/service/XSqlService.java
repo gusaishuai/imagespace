@@ -1,7 +1,7 @@
-package com.gss.service;
+package com.imagespace.sql.service;
 
-import com.gss.service.common.XSqlKeyWord;
-import com.gss.service.common.XSqlPagination;
+import com.imagespace.sql.service.common.XSqlKeyWord;
+import com.imagespace.sql.service.common.XSqlPagination;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;

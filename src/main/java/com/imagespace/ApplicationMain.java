@@ -1,12 +1,10 @@
-package com.gss;
+package com.imagespace;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * @author gusaishuai
@@ -14,11 +12,11 @@ import java.util.Properties;
  */
 @SpringBootApplication
 @ComponentScan({
-        "com.gss"
+        "com.imagespace"
 })
 public class ApplicationMain {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         SpringApplication.run(ApplicationMain.class, args);
     }
 

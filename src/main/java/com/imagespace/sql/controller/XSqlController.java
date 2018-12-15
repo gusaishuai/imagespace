@@ -1,9 +1,9 @@
-package com.gss.controller;
+package com.imagespace.sql.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.gss.service.XSqlService;
-import com.gss.service.common.XSqlExecType;
-import com.gss.service.common.XSqlKeyWord;
+import com.imagespace.sql.service.XSqlService;
+import com.imagespace.sql.service.common.XSqlExecType;
+import com.imagespace.sql.service.common.XSqlKeyWord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;

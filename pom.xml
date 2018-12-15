@@ -3,11 +3,23 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.gss</groupId>
-  <artifactId>xsql</artifactId>
+  <artifactId>imagespace</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>7</source>
+                    <target>7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <packaging>jar</packaging>
 
-  <name>xsql</name>
+  <name>imagespace</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -46,6 +58,11 @@
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
       <version>1.2.15</version>
+    </dependency>
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>2.9.0</version>
     </dependency>
   </dependencies>
 </project>

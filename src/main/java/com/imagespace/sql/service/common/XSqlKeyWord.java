@@ -1,4 +1,4 @@
-package com.gss.service.common;
+package com.imagespace.sql.service.common;
 
 import org.apache.commons.lang3.StringUtils;
 
