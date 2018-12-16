@@ -1,6 +1,7 @@
 package com.imagespace.common.service;
 
 import com.imagespace.common.model.CallResult;
+import com.imagespace.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface ICallApi {
 
-    CallResult exec(HttpServletRequest request, HttpServletResponse response);
+    CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response);
 
 }

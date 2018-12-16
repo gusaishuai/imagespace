@@ -4,7 +4,7 @@ public enum ResultCode {
 
     SUCCESS(0, "成功"),
     FAIL(-1, "失败"),
-    NO_LOGIN(1001, "用户未登录"),;
+    RE_LOGIN(1001, "用户需要重新登录"),;
 
     ResultCode(int code, String desc) {
         this.code = code;

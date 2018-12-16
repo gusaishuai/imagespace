@@ -1,9 +1,7 @@
 package com.imagespace.common.service.impl;
 
-import com.imagespace.login.controller.CaptchaController;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -13,50 +11,51 @@ import redis.clients.jedis.Jedis;
  * @since 2018/12/16
  */
 @Component
+@Slf4j
 public class RedisPool {
-
-    private static final Logger logger = LoggerFactory.getLogger(RedisPool.class);
 
     private static Jedis jedis = null;
 
     @Value("redis.url")
     private String redisUrl;
-    @Value("redis.port")
-    private String redisPort;
 
     RedisPool() {
         if (jedis != null) {
             return;
         }
-        if (StringUtils.isBlank(redisPort)) {
-            jedis = new Jedis(redisUrl);
-        } else {
-            jedis = new Jedis(redisUrl, Integer.valueOf(redisPort));
-        }
-    }
-
-    public void set(String key, String value) {
-        if (jedis == null) {
-            logger.warn("jedis is not initial yet");
-            return;
-        }
-        jedis.set(key, value);
+        jedis = new Jedis(redisUrl);
     }
 
     public void set(String key, String value, int seconds) {
-        if (jedis == null) {
-            logger.warn("jedis is not initial yet");
+        if (!valid(key, value)) {
             return;
         }
         jedis.setex(key, seconds, value);
     }
 
     public String get(String key) {
-        if (jedis == null) {
-            logger.warn("jedis is not initial yet");
+        if (!valid(key)) {
             return null;
         }
         return jedis.get(key);
+    }
+
+    public void del(String key) {
+        if (!valid(key)) {
+            return;
+        }
+        jedis.del(key);
+    }
+
+    private boolean valid(String... strs) {
+        if (jedis != null) {
+            log.warn("jedis is not initial yet");
+            return false;
+        } else if (StringUtils.isAnyBlank(strs)) {
+            log.warn("redis key-value either blank");
+            return false;
+        }
+        return true;
     }
 
 }

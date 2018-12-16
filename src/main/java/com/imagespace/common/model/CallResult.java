@@ -1,11 +1,16 @@
 package com.imagespace.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
  * @author gusaishuai
  * @since 2018/12/16
  */
+@Setter
+@Getter
 public class CallResult implements Serializable {
 
     private static final long serialVersionUID = 4486644554222823209L;
