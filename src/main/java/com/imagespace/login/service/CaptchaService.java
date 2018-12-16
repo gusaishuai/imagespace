@@ -3,6 +3,7 @@ package com.imagespace.login.service;
 import com.imagespace.common.anno.IgnoreUserCheck;
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.Constant;
+import com.imagespace.common.model.MediaCallResult;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.service.impl.RedisPool;
@@ -10,6 +11,7 @@ import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -29,7 +31,7 @@ import java.util.UUID;
  */
 @Slf4j
 @IgnoreUserCheck
-@Service("login.captcha")
+@Service("login.getCaptcha")
 public class CaptchaService implements ICallApi {
 
     //生成的图片的宽度
@@ -91,7 +93,7 @@ public class CaptchaService implements ICallApi {
                 ImageIO.write(bi, "png", os);
                 //保存到cookie和redis中
                 saveCookieAndRedis(response, captcha);
-                return new CallResult(os.toByteArray());
+                return new MediaCallResult(os.toByteArray(), MediaType.IMAGE_JPEG_VALUE);
             } catch (IOException e) {
                 log.error("getCaptcha imageIO write error", e);
             } finally {
@@ -105,7 +107,7 @@ public class CaptchaService implements ICallApi {
             }
             return new CallResult(ResultCode.FAIL, "获取验证码失败");
         } catch (Exception e) {
-            log.error("getCaptcha error", e);
+            log.error("login.getCaptcha error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         }
     }

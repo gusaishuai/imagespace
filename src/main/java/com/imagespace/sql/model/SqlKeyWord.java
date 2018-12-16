@@ -1,4 +1,4 @@
-package com.imagespace.sql.service.common;
+package com.imagespace.sql.model;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author gusaishuai
  * @since 17/5/2
  */
-public enum XSqlKeyWord {
+public enum SqlKeyWord {
 
     SELECT(true, "SELECT", false) {
         @Override
@@ -69,7 +69,7 @@ public enum XSqlKeyWord {
         }
     };
 
-    XSqlKeyWord(boolean isPrefix, String category, boolean needWhere) {
+    SqlKeyWord(boolean isPrefix, String category, boolean needWhere) {
         this.isPrefix = isPrefix;
         this.category = category;
         this.needWhere = needWhere;

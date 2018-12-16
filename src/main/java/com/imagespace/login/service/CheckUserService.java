@@ -9,8 +9,8 @@ import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.common.util.CommonUtil;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.common.util.TripleDESUtil;
-import com.imagespace.user.dao.UserDao;
 import com.imagespace.user.model.User;
+import com.imagespace.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +31,12 @@ import java.util.Arrays;
 public class CheckUserService implements ICallApi {
 
     private final RedisPool redisPool;
-    private final UserDao userDao;
+    private final UserService userService;
 
     @Autowired
-    public CheckUserService(RedisPool redisPool, UserDao userDao) {
+    public CheckUserService(RedisPool redisPool, UserService userService) {
         this.redisPool = redisPool;
-        this.userDao = userDao;
+        this.userService = userService;
     }
 
     @Override
@@ -44,52 +44,59 @@ public class CheckUserService implements ICallApi {
         String cookieCaptchaKey = null;
         try {
             String captcha = request.getParameter("captcha");
-            cookieCaptchaKey = Arrays.stream(request.getCookies())
+            if (StringUtils.isBlank(captcha)) {
+                throw new IllegalArgumentException("验证码为空");
+            }
+            Cookie[] cookies = request.getCookies();
+            cookieCaptchaKey = cookies == null ? null : Arrays.stream(cookies)
                     .filter(r -> StringUtils.equals(r.getName(), Constant.COOKIE_CAPTCHA_KEY))
                     .findFirst().map(Cookie::getValue).orElse(null);
             if (StringUtils.isBlank(cookieCaptchaKey)) {
-                return new CallResult(ResultCode.FAIL, "验证码无效");
+                throw new IllegalArgumentException("验证码无效");
             }
             String realCaptcha = redisPool.get(cookieCaptchaKey);
             if (StringUtils.isBlank(realCaptcha)) {
-                return new CallResult(ResultCode.FAIL, "验证码已过期");
+                throw new IllegalArgumentException("验证码已过期");
             } else if (!StringUtils.equalsIgnoreCase(captcha, realCaptcha)) {
-                return new CallResult(ResultCode.FAIL, "验证码错误");
+                throw new IllegalArgumentException("验证码错误");
             }
             String userName = request.getParameter("userName");
             if (StringUtils.isBlank(userName)) {
-                return new CallResult(ResultCode.FAIL, "用户名为空");
+                throw new IllegalArgumentException("用户名为空");
             }
             String password = request.getParameter("password");
             if (StringUtils.isBlank(password)) {
-                return new CallResult(ResultCode.FAIL, "密码为空");
+                throw new IllegalArgumentException("密码为空");
             }
             //ip+用户名
             String redisUserKey = CommonUtil.getIpAddr(request) + userName;
             String failNumStr = redisPool.get(redisUserKey);
             int failNum = StringUtils.isBlank(failNumStr) ? 0 : Integer.valueOf(failNumStr);
-            if (failNum > Constant.PASSWORD_FAIL_LIMIT) {
-                return new CallResult(ResultCode.FAIL,
-                        String.format("用户名：%s 由于密码失败过多已被禁止登录，请等待1小时后自动解锁", userName));
+            if (failNum >= Constant.PASSWORD_FAIL_LIMIT) {
+                throw new IllegalArgumentException("该用户由于密码失败过多已被禁止登录，请等待1小时后自动解锁");
             }
             //根据用户名称查询用户信息
-            User user = userDao.queryByLoginName(userName);
+            User user = userService.queryByLoginName(userName);
             if (user == null || !StringUtils.equals(password, user.getPassword())) {
                 String extraMsg = "";
                 int restNum = Constant.PASSWORD_FAIL_LIMIT - (failNum + 1);
-                if (restNum <= 2) {
-                    extraMsg = "|再失败" + restNum + "次，该用户将会被禁止登录";
+                if (restNum == 0) {
+                    extraMsg = " | 该用户已被禁止登录，请等待1小时后自动解锁";
+                } else if (restNum <= 2) {
+                    extraMsg = " | 再失败" + restNum + "次，该用户将会被禁止登录";
                 }
-                redisPool.set(redisUserKey, String.valueOf(failNum + 1), 24 * 60 * 60);
-                return new CallResult(ResultCode.FAIL, "用户名密码错误" + extraMsg);
+                redisPool.set(redisUserKey, String.valueOf(failNum + 1), 60 * 60);
+                throw new IllegalArgumentException("用户名密码错误" + extraMsg);
             }
             //登录成功删除之前失败的计数次数
             redisPool.del(redisUserKey);
             //保存到cookie中
             saveCookie(response, user.getId());
             return new CallResult();
+        } catch (IllegalArgumentException e) {
+            return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
-            log.error("checkUser error", e);
+            log.error("login.checkUser error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         } finally {
             //无论登录失败或成功，都需要删除验证码，防止用户在一个时间段内使用同一个验证码登录

@@ -3,6 +3,7 @@ package com.imagespace.common.controller;
 import com.imagespace.common.anno.IgnoreUserCheck;
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.Constant;
+import com.imagespace.common.model.MediaCallResult;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.service.impl.SpringContext;
@@ -48,7 +49,8 @@ public class CallController {
             }
             User user = null;
             if (!callApi.getClass().isAnnotationPresent(IgnoreUserCheck.class)) {
-                String cookieUserKey = Arrays.stream(request.getCookies())
+                Cookie[] cookies = request.getCookies();
+                String cookieUserKey = cookies == null ? null : Arrays.stream(cookies)
                         .filter(r -> StringUtils.equals(r.getName(), Constant.COOKIE_USER_KEY))
                         .findFirst().map(Cookie::getValue).orElse(null);
                 if (StringUtils.isBlank(cookieUserKey)) {
@@ -65,10 +67,23 @@ public class CallController {
                     return new CallResult(ResultCode.RE_LOGIN, "用户不存在");
                 }
             }
-            return callApi.exec(user, request, response);
+            CallResult callResult = callApi.exec(user, request, response);
+            if (callResult instanceof MediaCallResult) {
+                //流数据
+                MediaCallResult mediaCallResult = (MediaCallResult) callResult;
+                response.getOutputStream().write(mediaCallResult.getStream());
+                response.setHeader("Content-Type", mediaCallResult.getMediaType());
+                return null;
+            } else {
+                return callResult;
+            }
         } catch (Exception e) {
             log.error("method : {} , exec error", _mt, e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
+        } finally {
+            //跨域
+            response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+            response.setHeader("Access-Control-Allow-Credentials", "true");
         }
     }
 

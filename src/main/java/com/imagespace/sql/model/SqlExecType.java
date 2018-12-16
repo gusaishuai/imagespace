@@ -1,10 +1,10 @@
-package com.imagespace.sql.service.common;
+package com.imagespace.sql.model;
 
 /**
  * @author gusaishuai
  * @since 17/5/3
  */
-public enum XSqlExecType {
+public enum SqlExecType {
 
     EXEC,
     EXPORT;

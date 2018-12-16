@@ -2,28 +2,19 @@ package com.imagespace.common.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 /**
  * @author gusaishuai
  * @since 2018/12/16
  */
-@Component
 @Slf4j
 public class RedisPool {
 
-    private static Jedis jedis = null;
+    private Jedis jedis;
 
-    @Value("redis.url")
-    private String redisUrl;
-
-    RedisPool() {
-        if (jedis != null) {
-            return;
-        }
-        jedis = new Jedis(redisUrl);
+    public RedisPool(String redisUrl) {
+        this.jedis = new Jedis(redisUrl);
     }
 
     public void set(String key, String value, int seconds) {
@@ -48,7 +39,7 @@ public class RedisPool {
     }
 
     private boolean valid(String... strs) {
-        if (jedis != null) {
+        if (jedis == null) {
             log.warn("jedis is not initial yet");
             return false;
         } else if (StringUtils.isAnyBlank(strs)) {
