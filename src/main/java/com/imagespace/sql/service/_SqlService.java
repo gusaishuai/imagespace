@@ -62,4 +62,12 @@ public class _SqlService {
         return new SqlExecResult(pagination, resultList);
     }
 
+    /**
+     * 查询所有表
+     */
+    public List<String> getAllTables() {
+        String allTablesSql = "SHOW TABLES";
+        return jdbcTemplate.queryForList(allTablesSql, String.class);
+    }
+
 }
