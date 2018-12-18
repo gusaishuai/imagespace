@@ -93,7 +93,7 @@ public class CaptchaService implements ICallApi {
                 ImageIO.write(bi, "png", os);
                 //保存到cookie和redis中
                 saveCookieAndRedis(response, captcha);
-                return new MediaCallResult(os.toByteArray(), MediaType.IMAGE_JPEG_VALUE);
+                return new MediaCallResult(os.toByteArray(), MediaType.IMAGE_JPEG_VALUE, null);
             } catch (IOException e) {
                 log.error("getCaptcha imageIO write error", e);
             } finally {

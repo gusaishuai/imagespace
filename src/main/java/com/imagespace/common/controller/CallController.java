@@ -73,6 +73,10 @@ public class CallController {
                 MediaCallResult mediaCallResult = (MediaCallResult) callResult;
                 response.getOutputStream().write(mediaCallResult.getStream());
                 response.setHeader("Content-Type", mediaCallResult.getMediaType());
+                if (StringUtils.isNotBlank(mediaCallResult.getFileName())) {
+                    //下载的文件名
+                    response.setHeader("Content-Disposition", "attachment;filename=" + mediaCallResult.getFileName());
+                }
                 return null;
             } else {
                 return callResult;

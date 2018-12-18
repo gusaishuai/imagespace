@@ -22,11 +22,16 @@ public class MediaCallResult extends CallResult {
      * file：MediaType.APPLICATION_OCTET_STREAM_VALUE
      */
     private String mediaType;
+    /**
+     * 附件下载名称（如果页面直接显示，则置为空）
+     */
+    private String fileName;
 
-    public MediaCallResult(byte[] stream, String mediaType) {
+    public MediaCallResult(byte[] stream, String mediaType, String fileName) {
         super();
         this.stream = stream;
         this.mediaType = mediaType;
+        this.fileName = fileName;
     }
 
 }
