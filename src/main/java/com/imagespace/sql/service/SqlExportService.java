@@ -38,8 +38,15 @@ public class SqlExportService implements ICallApi {
             if (!SqlKeyWord.SELECT.start(sql)) {
                 throw new IllegalArgumentException("sql不是查询语句");
             }
-            String exportData = sqlService.exportQuery(sql);
-            return new MediaCallResult(exportData.getBytes(), MediaType.TEXT_PLAIN_VALUE, "sql.txt");
+            boolean pre = StringUtils.isNotBlank(request.getParameter("pre"));
+            if (pre) {
+                //预检测
+                sqlService.preCheck(sql);
+                return new CallResult();
+            } else {
+                String exportData = sqlService.exportQuery(sql);
+                return new MediaCallResult(exportData.getBytes(), MediaType.TEXT_PLAIN_VALUE, "sql.txt");
+            }
         } catch (IllegalArgumentException | DataAccessException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {

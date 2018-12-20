@@ -108,11 +108,17 @@ public class _SqlService {
     }
 
     /**
+     * 预检测
+     */
+    public void preCheck(String sql) {
+        //预检测
+        jdbcTemplate.execute(sql);
+    }
+
+    /**
      * 导出
      */
     public String exportQuery(String sql) {
-        //预检测
-        jdbcTemplate.execute(sql);
         // 执行sql
         List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql);
         // tab分隔
