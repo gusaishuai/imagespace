@@ -5,6 +5,7 @@ import com.imagespace.common.model.MediaCallResult;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
+import com.imagespace.sql.model.SqlKeyWord;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,9 @@ public class SqlExportService implements ICallApi {
             String sql = request.getParameter("sql");
             if (StringUtils.isBlank(sql)) {
                 throw new IllegalArgumentException("sql为空");
+            }
+            if (!SqlKeyWord.SELECT.start(sql)) {
+                throw new IllegalArgumentException("sql不是查询语句");
             }
             String exportData = sqlService.exportQuery(sql);
             return new MediaCallResult(exportData.getBytes(), MediaType.TEXT_PLAIN_VALUE, "sql.txt");

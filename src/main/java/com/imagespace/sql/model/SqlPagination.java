@@ -10,7 +10,7 @@ public class SqlPagination {
 	/**
 	 * 当前页数
 	 */
-	private int pageNo = 1;
+	private int pageNo;
 	/**
 	 * 每页展示
 	 */
