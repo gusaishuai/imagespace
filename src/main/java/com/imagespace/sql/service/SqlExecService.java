@@ -46,6 +46,8 @@ public class SqlExecService implements ICallApi {
                 sqlExecResult = sqlService.update(sql);
             } else if (SqlKeyWord.INSERT.start(sql)) {
                 sqlExecResult = sqlService.update(sql);
+            } else {
+                throw new IllegalArgumentException("非法的sql");
             }
             return new CallResult(sqlExecResult);
         } catch (IllegalArgumentException | DataAccessException e) {

@@ -31,20 +31,20 @@ public class SqlExportService implements ICallApi {
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
-            String sql = request.getParameter("sql");
-            if (StringUtils.isBlank(sql)) {
-                throw new IllegalArgumentException("sql为空");
-            }
-            if (!SqlKeyWord.SELECT.start(sql)) {
-                throw new IllegalArgumentException("sql不是查询语句");
-            }
-            boolean pre = StringUtils.isNotBlank(request.getParameter("pre"));
-            if (pre) {
+            String exportId = request.getParameter("exportId");
+            if (StringUtils.isBlank(exportId)) {
+                String sql = request.getParameter("sql");
+                if (StringUtils.isBlank(sql)) {
+                    throw new IllegalArgumentException("sql为空");
+                }
+                if (!SqlKeyWord.SELECT.start(sql)) {
+                    throw new IllegalArgumentException("sql不是查询语句");
+                }
                 //预检测
-                sqlService.preCheck(sql);
-                return new CallResult();
+                String exportUuid = sqlService.preExportQuery(sql);
+                return new CallResult(exportUuid);
             } else {
-                String exportData = sqlService.exportQuery(sql);
+                String exportData = sqlService.exportQuery(exportId);
                 return new MediaCallResult(exportData.getBytes(), MediaType.TEXT_PLAIN_VALUE, "sql.txt");
             }
         } catch (IllegalArgumentException | DataAccessException e) {

@@ -14,7 +14,7 @@ public class SqlPagination {
 	/**
 	 * 每页展示
 	 */
-	private int pageSize = 20;
+	private int pageSize = 15;
 	private int totalCount;
 
 	public SqlPagination(int currentPage, int totalCount) {

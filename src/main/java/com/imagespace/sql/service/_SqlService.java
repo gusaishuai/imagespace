@@ -1,5 +1,7 @@
 package com.imagespace.sql.service;
 
+import com.alibaba.fastjson.JSON;
+import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.sql.model.SqlExecResult;
 import com.imagespace.sql.model.SqlPagination;
 import org.apache.commons.lang3.StringUtils;
@@ -19,16 +21,20 @@ import java.util.*;
 @Service
 public class _SqlService {
 
-    @Value("${table.schema}")
+    @Value("${sql.table.schema}")
     private String tableSchema;
+    @Value("${sql.export.limit}")
+    private String exportLimit;
 
     private final JdbcTemplate jdbcTemplate;
+    private final RedisPool redisPool;
 
     @Autowired
-    public _SqlService(JdbcTemplate jdbcTemplate) {
+    public _SqlService(JdbcTemplate jdbcTemplate, RedisPool redisPool) {
         this.jdbcTemplate = jdbcTemplate;
         // 10秒超时
         this.jdbcTemplate.setQueryTimeout(10);
+        this.redisPool = redisPool;
     }
 
     /**
@@ -36,10 +42,7 @@ public class _SqlService {
      */
     public SqlExecResult select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
-        String countSql = String.format("SELECT COUNT(1) FROM (%s) AS TOTAL", sql);
-        // 查询总数
-        Map<String, Object> countMap = jdbcTemplate.queryForMap(countSql);
-        int totalCount = CollectionUtils.isEmpty(countMap) ? 0 : Integer.valueOf(countMap.get("count(1)").toString());
+        int totalCount = getTotalCount(sql);
         SqlPagination pagination = new SqlPagination(pageNo, totalCount);
         List<Map<String, Object>> resultList;
         if (totalCount == 0) {
@@ -50,6 +53,16 @@ public class _SqlService {
             resultList = jdbcTemplate.queryForList(sql);
         }
         return new SqlExecResult(pagination, resultList);
+    }
+
+    /**
+     * 获取总数
+     */
+    private int getTotalCount(String sql) {
+        String countSql = String.format("SELECT COUNT(1) FROM (%s) AS TOTAL", sql);
+        // 查询总数
+        Map<String, Object> countMap = jdbcTemplate.queryForMap(countSql);
+        return CollectionUtils.isEmpty(countMap) ? 0 : Integer.valueOf(countMap.get("count(1)").toString());
     }
 
     /**
@@ -108,30 +121,39 @@ public class _SqlService {
     }
 
     /**
-     * 预检测
+     * 导出预检测
      */
-    public void preCheck(String sql) {
-        //预检测
-        jdbcTemplate.execute(sql);
+    public String preExportQuery(String sql) {
+        sql = StringUtils.trim(sql).split(";")[0];
+        int totalCount = getTotalCount(sql);
+        if (totalCount > Integer.valueOf(exportLimit)) {
+            throw new IllegalArgumentException(String.format(
+                    "查询到：%s条数据，大于系统设定最大值：%s，请缩小范围", totalCount, exportLimit));
+        }
+        // 执行sql
+        List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql);
+        String exportUuid = UUID.randomUUID().toString();
+        redisPool.set(exportUuid, JSON.toJSONString(mapList), 60);
+        return exportUuid;
     }
 
     /**
      * 导出
      */
-    public String exportQuery(String sql) {
-        // 执行sql
-        List<Map<String, Object>> mapList = jdbcTemplate.queryForList(sql);
+    public String exportQuery(String exportId) {
+        String mapListJson = redisPool.get(exportId);
         // tab分隔
         StringBuilder sb = new StringBuilder();
+        List<Map> mapList = JSON.parseArray(mapListJson, Map.class);
         if (CollectionUtils.isEmpty(mapList)) {
             return sb.toString();
         }
-        for (String key : mapList.get(0).keySet()) {
+        for (Object key : mapList.get(0).keySet()) {
             sb.append(key).append("\t");
         }
         int i = sb.lastIndexOf("\t");
         sb.replace(i, i+1, "\n");
-        for (Map<String, Object> map : mapList) {
+        for (Map map : mapList) {
             for (Object value : map.values()) {
                 sb.append(value).append("\t");
             }
