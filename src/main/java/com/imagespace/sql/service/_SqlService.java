@@ -2,14 +2,14 @@ package com.imagespace.sql.service;
 
 import com.alibaba.fastjson.JSON;
 import com.imagespace.common.service.impl.RedisPool;
-import com.imagespace.sql.model.SqlExecResult;
+import com.imagespace.sql.model.SqlExecVo;
 import com.imagespace.sql.model.SqlPagination;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
  * @author gusaishuai
  * @since 2018/12/16
  */
-@Service
+@Component
 public class _SqlService {
 
     @Value("${sql.table.schema}")
@@ -40,7 +40,7 @@ public class _SqlService {
     /**
      * 查询
      */
-    public SqlExecResult select(String sql, int pageNo) {
+    public SqlExecVo select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
         int totalCount = getTotalCount(sql);
         SqlPagination pagination = new SqlPagination(pageNo, totalCount);
@@ -52,7 +52,7 @@ public class _SqlService {
             sql = String.format("%s LIMIT %s,%s", sql, pagination.start(), pagination.getPageSize());
             resultList = jdbcTemplate.queryForList(sql);
         }
-        return new SqlExecResult(pagination, resultList);
+        return new SqlExecVo(pagination, resultList);
     }
 
     /**
@@ -68,7 +68,7 @@ public class _SqlService {
     /**
      * 新增、更新、删除
      */
-    public SqlExecResult update(String sql) {
+    public SqlExecVo update(String sql) {
         // 更新，包含插入、更新和删除
         int count = jdbcTemplate.update(StringUtils.trim(sql).split(";")[0]);
         SqlPagination pagination = new SqlPagination(1, 1);
@@ -76,7 +76,7 @@ public class _SqlService {
         map.put("count", count);
         map.put("time", DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
         List<Map<String, Object>> resultList = Collections.singletonList(map);
-        return new SqlExecResult(pagination, resultList);
+        return new SqlExecVo(pagination, resultList);
     }
 
     /**

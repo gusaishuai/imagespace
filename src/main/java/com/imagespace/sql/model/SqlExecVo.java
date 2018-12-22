@@ -13,14 +13,14 @@ import java.util.Map;
  */
 @Setter
 @Getter
-public class SqlExecResult implements Serializable {
+public class SqlExecVo implements Serializable {
 
     private static final long serialVersionUID = -7788986212759792736L;
 
     private SqlPagination pagination;
     private List<Map<String, Object>> resultList;
 
-    public SqlExecResult(SqlPagination pagination, List<Map<String, Object>> resultList) {
+    public SqlExecVo(SqlPagination pagination, List<Map<String, Object>> resultList) {
         this.pagination = pagination;
         this.resultList = resultList;
     }

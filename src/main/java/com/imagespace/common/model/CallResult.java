@@ -11,9 +11,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-public class CallResult implements Serializable {
-
-    private static final long serialVersionUID = 4486644554222823209L;
+public class CallResult {
 
     private int code;
     private String msg;
