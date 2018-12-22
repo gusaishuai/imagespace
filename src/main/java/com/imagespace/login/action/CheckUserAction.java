@@ -6,7 +6,7 @@ import com.imagespace.common.model.Constant;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.service.impl.RedisPool;
-import com.imagespace.common.util.CommonUtil;
+import com.imagespace.common.util.HttpUtil;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.common.util.TripleDESUtil;
 import com.imagespace.user.model.User;
@@ -69,7 +69,7 @@ public class CheckUserAction implements ICallApi {
                 throw new IllegalArgumentException("密码为空");
             }
             //ip+用户名
-            String redisUserKey = CommonUtil.getIpAddr(request) + userName;
+            String redisUserKey = HttpUtil.getIpAddr(request) + userName;
             String failNumStr = redisPool.get(redisUserKey);
             int failNum = StringUtils.isBlank(failNumStr) ? 0 : Integer.valueOf(failNumStr);
             if (failNum >= Constant.PASSWORD_FAIL_LIMIT) {

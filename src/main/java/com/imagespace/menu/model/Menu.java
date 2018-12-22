@@ -18,5 +18,9 @@ public class Menu {
      */
     private String route;
     private String logo;
+    /**
+     * 排序，从小到大
+     */
+    private Integer sort;
 
 }
