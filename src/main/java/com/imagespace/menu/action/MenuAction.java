@@ -1,45 +1,43 @@
-package com.imagespace.sql.service;
+package com.imagespace.menu.action;
 
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
+import com.imagespace.menu.model.Menu;
+import com.imagespace.menu.model.MenuVo;
+import com.imagespace.menu.service.MenuService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author gusaishuai
- * @since 2018/12/18
+ * @since 18/12/22
  */
 @Slf4j
-@Service("sql.getIndex")
-public class SqlIndexService implements ICallApi {
+@Service("menu.getMenu")
+public class MenuAction implements ICallApi {
 
     @Autowired
-    private _SqlService sqlService;
+    private MenuService menuService;
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
-            String table = request.getParameter("table");
-            if (StringUtils.isBlank(table)) {
-                throw new IllegalArgumentException("table为空");
-            }
-            List<Map<String, Object>> tableIndexList = sqlService.getTableIndex(table);
-            return new CallResult(tableIndexList);
-        } catch (IllegalArgumentException | DataAccessException e) {
-            return new CallResult(ResultCode.FAIL, e.getMessage());
+            List<Menu> menuList = menuService.queryByUserId(_user.getId());
+            MenuVo vo = new MenuVo();
+            vo.setMenuList(menuList);
+            vo.setNick(StringUtils.isNotBlank(_user.getNick()) ? _user.getNick() : _user.getLoginName());
+            return new CallResult(vo);
         } catch (Exception e) {
-            log.error("sql.getIndex error", e);
+            log.error("menu.getMenu error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         }
     }

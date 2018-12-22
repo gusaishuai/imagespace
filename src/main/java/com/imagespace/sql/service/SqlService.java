@@ -19,7 +19,7 @@ import java.util.*;
  * @since 2018/12/16
  */
 @Component
-public class _SqlService {
+public class SqlService {
 
     @Value("${sql.table.schema}")
     private String tableSchema;
@@ -30,7 +30,7 @@ public class _SqlService {
     private final RedisPool redisPool;
 
     @Autowired
-    public _SqlService(JdbcTemplate jdbcTemplate, RedisPool redisPool) {
+    public SqlService(JdbcTemplate jdbcTemplate, RedisPool redisPool) {
         this.jdbcTemplate = jdbcTemplate;
         // 10秒超时
         this.jdbcTemplate.setQueryTimeout(10);

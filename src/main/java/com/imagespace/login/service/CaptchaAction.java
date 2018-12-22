@@ -32,7 +32,7 @@ import java.util.UUID;
 @Slf4j
 @IgnoreUserCheck
 @Service("login.getCaptcha")
-public class CaptchaService implements ICallApi {
+public class CaptchaAction implements ICallApi {
 
     //生成的图片的宽度
     private static final int WIDTH = 115;
@@ -44,7 +44,7 @@ public class CaptchaService implements ICallApi {
     private final RedisPool redisPool;
 
     @Autowired
-    public CaptchaService(RedisPool redisPool) {
+    public CaptchaAction(RedisPool redisPool) {
         this.redisPool = redisPool;
     }
 

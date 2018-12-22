@@ -26,4 +26,9 @@ public class UserServiceImpl implements UserService {
         return userDao.queryByLoginName(loginName);
     }
 
+    @Override
+    public void updatePwd(Long userId, String password) {
+        userDao.updatePwd(userId, password);
+    }
+
 }

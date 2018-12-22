@@ -15,4 +15,8 @@
         SELECT <include refid="all_columns"/> FROM t_user WHERE login_name = #{loginName}
     </select>
 
+    <update id="updatePwd">
+        UPDATE t_user SET password = #{password} WHERE id = #{userId}
+    </update>
+
 </mapper>

@@ -12,4 +12,6 @@ public interface UserService {
 
     User queryByLoginName(String loginName);
 
+    void updatePwd(Long userId, String password);
+
 }

@@ -28,13 +28,13 @@ import java.util.Arrays;
 @Slf4j
 @IgnoreUserCheck
 @Service("login.checkUser")
-public class CheckUserService implements ICallApi {
+public class CheckUserAction implements ICallApi {
 
     private final RedisPool redisPool;
     private final UserService userService;
 
     @Autowired
-    public CheckUserService(RedisPool redisPool, UserService userService) {
+    public CheckUserAction(RedisPool redisPool, UserService userService) {
         this.redisPool = redisPool;
         this.userService = userService;
     }
@@ -77,7 +77,7 @@ public class CheckUserService implements ICallApi {
             }
             //根据用户名称查询用户信息
             User user = userService.queryByLoginName(userName);
-            if (user == null || !StringUtils.equals(password, user.getPassword())) {
+            if (user == null || !StringUtils.equalsIgnoreCase(password, user.getPassword())) {
                 String extraMsg = "";
                 int restNum = Constant.PASSWORD_FAIL_LIMIT - (failNum + 1);
                 if (restNum == 0) {

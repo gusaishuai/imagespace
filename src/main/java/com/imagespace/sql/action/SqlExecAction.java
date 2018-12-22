@@ -1,4 +1,4 @@
-package com.imagespace.sql.service;
+package com.imagespace.sql.action;
 
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.ResultCode;
@@ -6,6 +6,7 @@ import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.sql.model.SqlExecVo;
 import com.imagespace.sql.model.SqlKeyWord;
+import com.imagespace.sql.service.SqlService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +23,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Service("sql.execSql")
-public class SqlExecService implements ICallApi {
+public class SqlExecAction implements ICallApi {
 
     @Autowired
-    private _SqlService sqlService;
+    private SqlService sqlService;
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
