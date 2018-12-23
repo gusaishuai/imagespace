@@ -41,7 +41,7 @@ public class ExcelUploadAction implements ICallApi {
             }
             if (multipartFile != null) {
                 FileUtils.writeByteArrayToFile(
-                        new File("D:/" + multipartFile.getOriginalFilename()), multipartFile.getBytes());
+                        new File("temp/excel/" + multipartFile.getOriginalFilename()), multipartFile.getBytes());
             }
             return new CallResult();
         } catch (IllegalArgumentException e) {
