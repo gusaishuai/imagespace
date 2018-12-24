@@ -1,4 +1,4 @@
-package com.imagespace.login.service;
+package com.imagespace.login.action;
 
 import com.imagespace.common.anno.IgnoreUserCheck;
 import com.imagespace.common.model.CallResult;

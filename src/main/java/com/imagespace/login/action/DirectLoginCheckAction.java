@@ -1,4 +1,4 @@
-package com.imagespace.login.service;
+package com.imagespace.login.action;
 
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.service.ICallApi;
