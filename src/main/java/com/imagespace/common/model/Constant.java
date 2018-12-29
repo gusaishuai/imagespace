@@ -15,6 +15,10 @@ public class Constant {
      */
     public static final String COOKIE_USER_KEY = "userKey";
     /**
+     * cookie中存的excel名称
+     */
+    public static final String COOKIE_EXCEL_NAME = "excelName";
+    /**
      * 密码失败超过5次会停用IP+登录账号
      */
     public static final int PASSWORD_FAIL_LIMIT = 5;
