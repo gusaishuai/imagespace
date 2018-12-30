@@ -54,8 +54,8 @@ public class ExcelService {
                             return !colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
                         }
                     });
-                    //把不满足的行过滤出来
-                    if (!match) {
+                    //把满足的行过滤出来
+                    if (match) {
                         resultList.add(colList);
                     }
                 }

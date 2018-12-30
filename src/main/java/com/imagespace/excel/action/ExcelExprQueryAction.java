@@ -38,19 +38,19 @@ public class ExcelExprQueryAction implements ICallApi {
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
             //代表以下6项内容的下标值
-            String[] exprRows = request.getParameterValues("exprRows");
+            String[] exprRows = request.getParameterValues("exprRows[]");
             //左括号，可多个，如：((，整体的表达式中，左括号必须和右括号的数量一致
-            String[] leftBracket = request.getParameterValues("leftBracket");
+            String[] leftBracket = request.getParameterValues("leftBracket[]");
             //列数
-            String[] colNum = request.getParameterValues("colNum");
+            String[] colNum = request.getParameterValues("colNum[]");
             //满足条件 1-满足 0-不满足
-            String[] match = request.getParameterValues("match");
+            String[] match = request.getParameterValues("match[]");
             //值或正则表达式
-            String[] regex = request.getParameterValues("regex");
+            String[] regex = request.getParameterValues("regex[]");
             //右括号，可多个，如：))，整体的表达式中，左括号必须和右括号的数量一致
-            String[] rightBracket = request.getParameterValues("rightBracket");
+            String[] rightBracket = request.getParameterValues("rightBracket[]");
             //连接符 &-并且 |-或者
-            String[] conj = request.getParameterValues("conj");
+            String[] conj = request.getParameterValues("conj[]");
 
             Cookie[] cookies = request.getCookies();
             String excelName = cookies == null ? null : Arrays.stream(cookies)
@@ -112,11 +112,16 @@ public class ExcelExprQueryAction implements ICallApi {
                 int row = 0;
                 for (int exprRow : exprRowList) {
                     String conjValue = conj[exprRow];
-                    if (row == exprRowList.size() - 1 && StringUtils.isNotBlank(conjValue)) {
-                        throw new IllegalArgumentException("最后一行规则请不要加#连接符（并且、或者）#");
-                    } else if (StringUtils.isBlank(conjValue)) {
-                        throw new IllegalArgumentException("#连接符（并且、或者）#存在为空的行，导致无法连接规则");
-                    } else if (StringUtils.isNotBlank(conjValue)
+                    if (row == exprRowList.size() - 1) {
+                        if (StringUtils.isNotBlank(conjValue)) {
+                            throw new IllegalArgumentException("最后一行规则请不要加#连接符（并且、或者）#");
+                        }
+                    } else {
+                        if (StringUtils.isBlank(conjValue)) {
+                            throw new IllegalArgumentException("#连接符（并且、或者）#存在为空的行，导致无法连接规则");
+                        }
+                    }
+                    if (StringUtils.isNotBlank(conjValue)
                             && !StringUtils.equals(String.valueOf(RpnPattern.AND.getPattern()), conjValue)
                             && !StringUtils.equals(String.valueOf(RpnPattern.OR.getPattern()), conjValue)) {
                         throw new IllegalArgumentException("#连接符（并且、或者）#存在非法字符的行");

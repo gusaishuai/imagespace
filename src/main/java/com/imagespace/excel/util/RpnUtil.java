@@ -24,11 +24,13 @@ public class RpnUtil {
         //非运算符可能有多位，标志开始位置
         int pre;
         //是否运算符
-        boolean isPattern = true;
-        int leftBracket = 0; // 左括号的数量
+        boolean isPattern;
+        //左括号的数量
+        int leftBracket = 0;
 
         for (int i = 0; i < chars.length;) {
             pre = i;
+            isPattern = true;
             //截取数字
             while (i < chars.length && !RpnPattern.isPattern(chars[i])) {
                 i++;
