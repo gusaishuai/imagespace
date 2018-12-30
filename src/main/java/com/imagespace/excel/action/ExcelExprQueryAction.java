@@ -8,7 +8,7 @@ import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.excel.model.ExcelExpr;
 import com.imagespace.excel.model.RpnPattern;
-import com.imagespace.excel.service.ExcelService;
+import com.imagespace.excel.service.impl.ExcelService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +60,7 @@ public class ExcelExprQueryAction implements ICallApi {
                 throw new IllegalArgumentException("请上传EXCEL");
             }
 
-            StringBuilder expr = new StringBuilder();
+            String expr = null;
 
             if (exprRows != null && exprRows.length > 0) {
                 List<Integer> exprRowList = Arrays.stream(exprRows).map(Integer::valueOf).collect(Collectors.toList());
@@ -124,24 +124,26 @@ public class ExcelExprQueryAction implements ICallApi {
                     row++;
                 }
 
+                StringBuilder exprSb = new StringBuilder();
                 for (int exprRow : exprRowList) {
                     String leftBracketValue = leftBracket[exprRow];
                     String rightBracketValue = rightBracket[exprRow];
                     String conjValue = conj[exprRow];
-                    expr.append(StringUtils.isBlank(leftBracketValue) ? "" : leftBracketValue);
+                    exprSb.append(StringUtils.isBlank(leftBracketValue) ? "" : leftBracketValue);
                     ExcelExpr excelRule = new ExcelExpr();
                     excelRule.setColNum(Integer.valueOf(colNum[exprRow]));
                     excelRule.setMatch(StringUtils.equals("1", match[exprRow]));
                     excelRule.setRegex(regex[exprRow]);
-                    expr.append(JSON.toJSONString(excelRule));
-                    expr.append(StringUtils.isBlank(rightBracketValue) ? "" : rightBracketValue);
-                    expr.append(StringUtils.isBlank(conjValue) ? "" : conjValue);
+                    exprSb.append(JSON.toJSONString(excelRule));
+                    exprSb.append(StringUtils.isBlank(rightBracketValue) ? "" : rightBracketValue);
+                    exprSb.append(StringUtils.isBlank(conjValue) ? "" : conjValue);
                 }
+                expr = exprSb.toString();
             }
 
-            excelService.queryByExpr(excelName, expr.toString());
+            List<List<String>> resultList = excelService.queryByExpr(excelName, expr);
 
-            return new CallResult();
+            return new CallResult(resultList);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {

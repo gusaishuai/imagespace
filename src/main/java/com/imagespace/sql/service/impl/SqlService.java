@@ -1,4 +1,4 @@
-package com.imagespace.sql.service;
+package com.imagespace.sql.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.imagespace.common.service.impl.RedisPool;

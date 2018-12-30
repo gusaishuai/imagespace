@@ -8,7 +8,9 @@ import java.util.List;
  */
 public class ExcelExprs {
 
+    //表达式，例如：(1&2)|(3&4)
     private String expr;
+    //EXCEL表达式对象列表，按顺序对应表达式的1、2、3、4...
     private List<ExcelExpr> excelExprList;
 
     public String getExpr() {
