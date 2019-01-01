@@ -10,6 +10,7 @@ import com.imagespace.excel.model.ExcelExprs;
 import com.imagespace.excel.util.RpnUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +37,16 @@ public class ExcelService {
     public List<List<String>> queryByExpr(String excelName, String expr) {
         FileInputStream fis = null;
         try {
-            ExcelExprs excelExprs = buildExpr(expr);
+            //表达式替换json
+            ExcelExprs excelExprs = exprReplaceJson(expr);
+            //生成逆波兰表达式
             String[] rpnExprArray = RpnUtil.generateRpnExpr(excelExprs.getExpr());
 
             List<List<String>> resultList = new ArrayList<>();
 
             fis = FileUtils.openInputStream(new File(tempDir + excelName));
+            //读取EXCEL
             new ExcelReader(fis, null, new AnalysisEventListener<List<String>>() {
-
                 @Override
                 public void invoke(List<String> colList, AnalysisContext context) {
                     boolean match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
@@ -59,7 +62,6 @@ public class ExcelService {
                         resultList.add(colList);
                     }
                 }
-
                 @Override
                 public void doAfterAllAnalysed(AnalysisContext context) {
 
@@ -81,8 +83,14 @@ public class ExcelService {
         }
     }
 
-    private ExcelExprs buildExpr(String expr) {
+    /**
+     * 表达式替换json
+     */
+    private ExcelExprs exprReplaceJson(String expr) {
         ExcelExprs excelExprs = new ExcelExprs();
+        if (StringUtils.isBlank(expr)) {
+            return excelExprs;
+        }
         List<ExcelExpr> excelExprList = new ArrayList<>();
         Pattern p = Pattern.compile("\\{.*?\\}");
         Matcher matcher = p.matcher(expr);

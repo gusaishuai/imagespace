@@ -2,6 +2,7 @@ package com.imagespace.excel.util;
 
 import com.imagespace.excel.model.RpnPattern;
 import com.imagespace.excel.service.IRpnExcelCalc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Stack;
 
@@ -15,6 +16,9 @@ public class RpnUtil {
      * 生成逆波兰表达式
      */
     public static String[] generateRpnExpr(String expr) {
+        if (StringUtils.isBlank(expr)) {
+            return new String[]{};
+        }
         //运算符
         Stack<Character> patterns = new Stack<>();
         //输出结果
@@ -84,6 +88,10 @@ public class RpnUtil {
      * 逆波兰表达式计算
      */
     public static boolean calcRpnExpr(String[] rpnExprArray, IRpnExcelCalc rpnExcelCalc) {
+        //没有任何过滤条件，则直接返回true
+        if (rpnExprArray == null || rpnExprArray.length == 0) {
+            return true;
+        }
         Stack<Boolean> calcResult = new Stack<>();
         for (String rpnExpr : rpnExprArray) {
             if (!RpnPattern.isPattern(rpnExpr)) {
@@ -93,7 +101,8 @@ public class RpnUtil {
                         calcResult.pop(), calcResult.pop(), rpnExpr.charAt(0)));
             }
         }
-        return calcResult.size() == 1 ? calcResult.pop() : false;
+        //这里size不等于1说明有问题，直接返回true让页面显示
+        return calcResult.size() == 1 ? calcResult.pop() : true;
     }
 
 }
