@@ -37,6 +37,10 @@ public class ExcelExprQueryAction implements ICallApi {
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
+            //sheet数
+            String sheetNumStr = request.getParameter("sheetNum");
+            //表头行数
+            String topNumStr = request.getParameter("topNum");
             //代表以下6项内容的下标值
             String[] exprRows = request.getParameterValues("exprRows[]");
             //左括号，可多个，如：((，整体的表达式中，左括号必须和右括号的数量一致
@@ -58,6 +62,13 @@ public class ExcelExprQueryAction implements ICallApi {
                     .findFirst().map(Cookie::getValue).orElse(null);
             if (StringUtils.isBlank(excelName)) {
                 throw new IllegalArgumentException("请上传EXCEL");
+            }
+
+            if (StringUtils.isNotBlank(sheetNumStr) && !StringUtils.isNumeric(sheetNumStr)) {
+                throw new IllegalArgumentException("sheet数必须为数字");
+            }
+            if (StringUtils.isNotBlank(topNumStr) && !StringUtils.isNumeric(topNumStr)) {
+                throw new IllegalArgumentException("表头行数必须为数字");
             }
 
             String expr = null;
@@ -135,18 +146,21 @@ public class ExcelExprQueryAction implements ICallApi {
                     String rightBracketValue = rightBracket[exprRow];
                     String conjValue = conj[exprRow];
                     exprSb.append(StringUtils.isBlank(leftBracketValue) ? "" : leftBracketValue);
-                    ExcelExpr excelRule = new ExcelExpr();
-                    excelRule.setColNum(Integer.valueOf(colNum[exprRow]));
-                    excelRule.setMatch(StringUtils.equals("1", match[exprRow]));
-                    excelRule.setRegex(regex[exprRow]);
-                    exprSb.append(JSON.toJSONString(excelRule));
+                    ExcelExpr excelExpr = new ExcelExpr();
+                    excelExpr.setColNum(Integer.valueOf(colNum[exprRow]));
+                    excelExpr.setMatch(StringUtils.equals("1", match[exprRow]));
+                    excelExpr.setRegex(regex[exprRow]);
+                    exprSb.append(JSON.toJSONString(excelExpr));
                     exprSb.append(StringUtils.isBlank(rightBracketValue) ? "" : rightBracketValue);
                     exprSb.append(StringUtils.isBlank(conjValue) ? "" : conjValue);
                 }
                 expr = exprSb.toString();
             }
 
-            List<List<String>> resultList = excelService.queryByExpr(excelName, expr);
+            int sheetNum = StringUtils.isBlank(sheetNumStr) ? 1 : Integer.valueOf(sheetNumStr);
+            int topNum = StringUtils.isBlank(topNumStr) ? 0 : Integer.valueOf(topNumStr);
+
+            List<List<String>> resultList = excelService.queryByExpr(excelName, sheetNum, topNum, expr);
 
             return new CallResult(resultList);
         } catch (IllegalArgumentException e) {

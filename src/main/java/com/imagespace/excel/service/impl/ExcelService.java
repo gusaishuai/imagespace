@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSON;
 import com.imagespace.excel.model.ExcelExpr;
 import com.imagespace.excel.model.ExcelExprs;
 import com.imagespace.excel.util.RpnUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +26,13 @@ import java.util.regex.Pattern;
  * @author gusaishuai
  * @since 2018/12/29
  */
-@Slf4j
 @Service
 public class ExcelService {
 
     @Value("${excel.upload.tempdir}")
     private String tempDir;
 
-    public List<List<String>> queryByExpr(String excelName, String expr) {
+    public List<List<String>> queryByExpr(String excelName, int sheetNum, int topNum, String expr) {
         FileInputStream fis = null;
         try {
             //表达式替换json
@@ -49,14 +47,20 @@ public class ExcelService {
             new ExcelReader(fis, null, new AnalysisEventListener<List<String>>() {
                 @Override
                 public void invoke(List<String> colList, AnalysisContext context) {
-                    boolean match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
-                        ExcelExpr excelExpr = excelExprs.getExcelExprList().get(position);
-                        if (excelExpr.isMatch()) {
-                            return colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
-                        } else {
-                            return !colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
-                        }
-                    });
+                    boolean match;
+                    //表头数据不参与判断
+                    if (context.getCurrentRowNum() + 1 <= topNum) {
+                        match = true;
+                    } else {
+                        match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
+                            ExcelExpr excelExpr = excelExprs.getExcelExprList().get(position);
+                            if (excelExpr.isMatch()) {
+                                return colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                            } else {
+                                return !colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                            }
+                        });
+                    }
                     //把满足的行过滤出来
                     if (match) {
                         resultList.add(colList);
@@ -66,18 +70,17 @@ public class ExcelService {
                 public void doAfterAllAnalysed(AnalysisContext context) {
 
                 }
-            }, false).read(new Sheet(1, 0));
+            }, false).read(new Sheet(sheetNum, 0));
 
             return resultList;
         } catch (IOException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
+            throw new IllegalArgumentException(e);
         } finally {
             if (fis != null) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    log.error("sss");
+                    e.printStackTrace();
                 }
             }
         }
