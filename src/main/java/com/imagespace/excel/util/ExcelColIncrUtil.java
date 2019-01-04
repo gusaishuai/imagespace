@@ -26,6 +26,7 @@ public class ExcelColIncrUtil {
         String letter = "";
         if (divide > letters.length) {
             letter = getLetter(divide);
+            divide -= letters.length;
         }
         if (mod == 0) {
             if (divide - 2 < 0) {
