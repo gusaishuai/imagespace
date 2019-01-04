@@ -5,8 +5,8 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.fastjson.JSON;
-import com.imagespace.excel.model.ExcelExpr;
-import com.imagespace.excel.model.ExcelExprs;
+import com.imagespace.excel.model.*;
+import com.imagespace.excel.util.ExcelColIncrUtil;
 import com.imagespace.excel.util.RpnUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ public class ExcelService {
     @Value("${excel.upload.tempdir}")
     private String tempDir;
 
-    public List<List<String>> queryByExpr(String excelName, int sheetNum, int topNum, String expr) {
+    public ExcelModel queryByExpr(String excelName, int sheetNum, int topNum, String expr) {
         FileInputStream fis = null;
         try {
             //表达式替换json
@@ -40,7 +40,9 @@ public class ExcelService {
             //生成逆波兰表达式
             String[] rpnExprArray = RpnUtil.generateRpnExpr(excelExprs.getExpr());
 
-            List<List<String>> resultList = new ArrayList<>();
+            ExcelModel excelModel = new ExcelModel();
+
+            List<ExcelRow> excelRowList = new ArrayList<>();
 
             fis = FileUtils.openInputStream(new File(tempDir + excelName));
             //读取EXCEL
@@ -48,8 +50,9 @@ public class ExcelService {
                 @Override
                 public void invoke(List<String> colList, AnalysisContext context) {
                     boolean match;
+                    int currentRowNum = context.getCurrentRowNum() + 1;
                     //表头数据不参与判断
-                    if (context.getCurrentRowNum() + 1 <= topNum) {
+                    if (currentRowNum <= topNum) {
                         match = true;
                     } else {
                         match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
@@ -63,16 +66,23 @@ public class ExcelService {
                     }
                     //把满足的行过滤出来
                     if (match) {
-                        resultList.add(colList);
+                        int i = 1;
+                        List<ExcelCol> excelColList = new ArrayList<>();
+                        for (String col : colList) {
+                            excelColList.add(new ExcelCol(ExcelColIncrUtil.getColIndex(i), col));
+                            i++;
+                        }
+                        excelRowList.add(new ExcelRow(currentRowNum, excelColList));
                     }
                 }
                 @Override
                 public void doAfterAllAnalysed(AnalysisContext context) {
-
+                    excelModel.setTotalCount(context.getTotalCount());
+                    excelModel.setExcelRowList(excelRowList);
                 }
             }, false).read(new Sheet(sheetNum, 0));
 
-            return resultList;
+            return excelModel;
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         } finally {

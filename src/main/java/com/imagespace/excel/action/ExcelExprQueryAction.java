@@ -7,6 +7,8 @@ import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.excel.model.ExcelExpr;
+import com.imagespace.excel.model.ExcelModel;
+import com.imagespace.excel.model.ExcelRow;
 import com.imagespace.excel.model.RpnPattern;
 import com.imagespace.excel.service.impl.ExcelService;
 import com.imagespace.user.model.User;
@@ -160,9 +162,10 @@ public class ExcelExprQueryAction implements ICallApi {
             int sheetNum = StringUtils.isBlank(sheetNumStr) ? 1 : Integer.valueOf(sheetNumStr);
             int topNum = StringUtils.isBlank(topNumStr) ? 0 : Integer.valueOf(topNumStr);
 
-            List<List<String>> resultList = excelService.queryByExpr(excelName, sheetNum, topNum, expr);
+            //根据表达式过滤表格中符合的数据
+            ExcelModel excelModel = excelService.queryByExpr(excelName, sheetNum, topNum, expr);
 
-            return new CallResult(resultList);
+            return new CallResult(excelModel);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {

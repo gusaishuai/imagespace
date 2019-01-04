@@ -1,40 +1,49 @@
 package com.imagespace.excel.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author gusaishuai
  * @since 2019/1/3
  */
 public class ExcelColIncrUtil {
 
-    private static String[] letters = {"A", "B", "C", "D"};
+    //定义初始列号，当大于此列表，自动扩容
+    private static List<String> colIndexList = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H",
+            "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
 
-    public static void main(String[] args) {
-        //1 2 3 4 5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21  22
-        //A B C D AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD AAA AAB
-//        System.out.println(21 / letters.length);
-//        System.out.println(21 % letters.length);
-
-        System.out.println(getLetter(21));
+    /**
+     * 序号（数字）转字母序号（如：AA），增加缓存区
+     */
+    public static String getColIndex(int colIndex) {
+        if (colIndex <= 0) {
+            throw new IllegalArgumentException("列数必须大于0");
+        } else if (colIndex > 1 << 16) {
+            throw new IllegalArgumentException("列数不要大于65536行");
+        }
+        if (colIndex > colIndexList.size()) {
+            for (int initialNum=colIndexList.size()+1;initialNum<colIndex;initialNum++) {
+                colIndexList.add(colIncr(initialNum));
+            }
+        }
+        return colIndexList.get(colIndex - 1);
     }
 
-    private static String getLetter(int index) {
-        int divide = index / letters.length;
-        int mod = index % letters.length;
-        if (divide == 0) {
-            return letters[mod - 1];
-        }
-        String letter = "";
-        if (divide > letters.length) {
-            letter = getLetter(divide);
-            divide -= letters.length;
-        }
-        if (mod == 0) {
-            if (divide - 2 < 0) {
-                return letters[letters.length - 1];
+    /**
+     * 序号（数字）转字母序号（如：AA）
+     */
+    private static String colIncr(int colIndex) {
+        StringBuilder columnStr = new StringBuilder();
+        colIndex--;
+        while (colIndex > 0) {
+            if (columnStr.length() > 0) {
+                colIndex--;
             }
-            return letter + letters[divide - 2] + letters[letters.length - 1];
+            columnStr.insert(0, ((char) (colIndex % 26 + (int) 'A')));
+            colIndex = (colIndex - colIndex % 26) / 26;
         }
-        return letter + letters[divide - 1] + letters[mod - 1];
+        return columnStr.toString();
     }
 
 }
