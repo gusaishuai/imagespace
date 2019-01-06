@@ -1,5 +1,6 @@
 package com.imagespace.sql.model;
 
+import com.imagespace.common.model.Pagination;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,10 +18,10 @@ public class SqlExecVo implements Serializable {
 
     private static final long serialVersionUID = -7788986212759792736L;
 
-    private SqlPagination pagination;
+    private Pagination pagination;
     private List<Map<String, Object>> resultList;
 
-    public SqlExecVo(SqlPagination pagination, List<Map<String, Object>> resultList) {
+    public SqlExecVo(Pagination pagination, List<Map<String, Object>> resultList) {
         this.pagination = pagination;
         this.resultList = resultList;
     }

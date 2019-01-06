@@ -7,6 +7,7 @@ import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.Iterator;
-import java.util.UUID;
 
 /**
  * @author gusaishuai
@@ -50,9 +50,11 @@ public class ExcelUploadAction implements ICallApi {
             if (multipartFile == null) {
                 throw new IllegalArgumentException("无法获取上传文件");
             }
+            //计算文件MD5，防止重复上传
+            String fileMD5 = DigestUtils.md5Hex(multipartFile.getBytes());
             //重新生成文件名称
-            String newFileName = String.format("%s%s%s", UUID.randomUUID().toString(),
-                    FilenameUtils.EXTENSION_SEPARATOR_STR, FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
+            String newFileName = String.format("%s%s%s", fileMD5, FilenameUtils.EXTENSION_SEPARATOR_STR,
+                    FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
             //写入磁盘
             FileUtils.writeByteArrayToFile(new File(tempDir + newFileName), multipartFile.getBytes());
             //保存cookie

@@ -1,9 +1,9 @@
 package com.imagespace.sql.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.imagespace.common.model.Pagination;
 import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.sql.model.SqlExecVo;
-import com.imagespace.sql.model.SqlPagination;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class SqlService {
     public SqlExecVo select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
         int totalCount = getTotalCount(sql);
-        SqlPagination pagination = new SqlPagination(pageNo, totalCount);
+        Pagination pagination = new Pagination(pageNo, totalCount);
         List<Map<String, Object>> resultList;
         if (totalCount == 0) {
             resultList = new ArrayList<>();
@@ -71,7 +71,7 @@ public class SqlService {
     public SqlExecVo update(String sql) {
         // 更新，包含插入、更新和删除
         int count = jdbcTemplate.update(StringUtils.trim(sql).split(";")[0]);
-        SqlPagination pagination = new SqlPagination(1, 1);
+        Pagination pagination = new Pagination(1, 1);
         Map<String, Object> map = new HashMap<>();
         map.put("count", count);
         map.put("time", DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));

@@ -6,7 +6,7 @@ import java.util.List;
  * @author gusaishuai
  * @since 2018/12/29
  */
-public class ExcelExprs {
+public class ExcelExprModel {
 
     //表达式，例如：(1&2)|(3&4)
     private String expr;

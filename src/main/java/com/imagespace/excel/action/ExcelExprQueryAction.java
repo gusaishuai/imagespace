@@ -8,18 +8,19 @@ import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.excel.model.ExcelExpr;
 import com.imagespace.excel.model.ExcelModel;
-import com.imagespace.excel.model.ExcelRow;
 import com.imagespace.excel.model.RpnPattern;
 import com.imagespace.excel.service.impl.ExcelService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +36,8 @@ public class ExcelExprQueryAction implements ICallApi {
 
     @Autowired
     private ExcelService excelService;
+    @Value("${excel.upload.tempdir}")
+    private String tempDir;
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
@@ -43,6 +46,8 @@ public class ExcelExprQueryAction implements ICallApi {
             String sheetNumStr = request.getParameter("sheetNum");
             //表头行数
             String topNumStr = request.getParameter("topNum");
+            //当前页数
+            String pageNoStr = request.getParameter("pageNo");
             //代表以下6项内容的下标值
             String[] exprRows = request.getParameterValues("exprRows[]");
             //左括号，可多个，如：((，整体的表达式中，左括号必须和右括号的数量一致
@@ -64,6 +69,10 @@ public class ExcelExprQueryAction implements ICallApi {
                     .findFirst().map(Cookie::getValue).orElse(null);
             if (StringUtils.isBlank(excelName)) {
                 throw new IllegalArgumentException("请上传EXCEL");
+            }
+            File excel = new File(tempDir + excelName);
+            if (!excel.exists()) {
+                throw new IllegalArgumentException("请重新上传EXCEL");
             }
 
             if (StringUtils.isNotBlank(sheetNumStr) && !StringUtils.isNumeric(sheetNumStr)) {
@@ -161,10 +170,10 @@ public class ExcelExprQueryAction implements ICallApi {
 
             int sheetNum = StringUtils.isBlank(sheetNumStr) ? 1 : Integer.valueOf(sheetNumStr);
             int topNum = StringUtils.isBlank(topNumStr) ? 0 : Integer.valueOf(topNumStr);
+            int pageNo = StringUtils.isBlank(pageNoStr) ? 1 : Integer.valueOf(pageNoStr);
 
             //根据表达式过滤表格中符合的数据
-            ExcelModel excelModel = excelService.queryByExpr(excelName, sheetNum, topNum, expr);
-
+            ExcelModel excelModel = excelService.filterExcel(excel, expr, sheetNum, topNum, pageNo);
             return new CallResult(excelModel);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());

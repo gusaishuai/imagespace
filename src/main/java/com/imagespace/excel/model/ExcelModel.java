@@ -1,8 +1,9 @@
 package com.imagespace.excel.model;
 
-import org.apache.commons.collections4.CollectionUtils;
+import com.imagespace.common.model.Pagination;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gusaishuai
@@ -10,27 +11,24 @@ import java.util.List;
  */
 public class ExcelModel {
 
-    //excel数据总数（不是过滤下来的总数）
-    private int totalCount;
-    private List<ExcelRow> excelRowList;
+    //分页信息
+    private Pagination pagination;
+    //EXCEL信息
+    private List<Map<String, String>> excelDataList;
 
-    public int getTotalCount() {
-        return totalCount;
+    public Pagination getPagination() {
+        return pagination;
     }
 
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
     }
 
-    public List<ExcelRow> getExcelRowList() {
-        return excelRowList;
+    public List<Map<String, String>> getExcelDataList() {
+        return excelDataList;
     }
 
-    public void setExcelRowList(List<ExcelRow> excelRowList) {
-        this.excelRowList = excelRowList;
-    }
-
-    public int getFilterCount() {
-        return CollectionUtils.isEmpty(excelRowList) ? 0 : excelRowList.size();
+    public void setExcelDataList(List<Map<String, String>> excelDataList) {
+        this.excelDataList = excelDataList;
     }
 }
