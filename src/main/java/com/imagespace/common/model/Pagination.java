@@ -30,6 +30,18 @@ public class Pagination {
 		return 0;
 	}
 
+	public int start(int offset) {
+		int start = start();
+		if (offset > 0) {
+			int end = end();
+			if (start + offset > end) {
+				return end;
+			}
+			return start + offset;
+		}
+		return start;
+	}
+
 	public int end() {
 		if (pageNo > 0) {
 			int end = pageNo * pageSize;

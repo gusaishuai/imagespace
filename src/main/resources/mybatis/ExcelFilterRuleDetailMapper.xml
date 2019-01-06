@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.imagespace.excel.dao.ExcelFilterRuleDetailDao">
+
+    <sql id="all_columns" >
+        id, rule_id ruleId, left_bracket leftBracket, col_num colNum, matched, regex, right_bracket rightBracket, conj
+    </sql>
+
+    <select id="queryByRuleId" resultType="com.imagespace.excel.model.ExcelFilterRuleDetail">
+        SELECT <include refid="all_columns"/> FROM t_excel_filter_rule_detail WHERE rule_id = #{ruleId}
+    </select>
+
+</mapper>

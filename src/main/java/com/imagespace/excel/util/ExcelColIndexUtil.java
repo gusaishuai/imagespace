@@ -1,5 +1,6 @@
 package com.imagespace.excel.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,9 +10,10 @@ import java.util.List;
  */
 public class ExcelColIndexUtil {
 
+
     //定义初始列号，当大于此列表，才进行扩容
-    private static List<String> colIndexList = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H",
-            "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+    private static List<String> colIndexList = new ArrayList<>(Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H",
+            "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"));
 
     /**
      * 序号（数字）转字母序号（如：AA），增加缓存区
@@ -23,8 +25,8 @@ public class ExcelColIndexUtil {
             throw new IllegalArgumentException("列数不要大于65536行");
         }
         if (colIndex > colIndexList.size()) {
-            for (int i=colIndexList.size()+1;i<colIndex;i++) {
-                colIndexList.add(colIndex(i));
+            for (int i = colIndexList.size(); i < colIndex; i++) {
+                colIndexList.add(colIndex(i + 1));
             }
         }
         return colIndexList.get(colIndex - 1);

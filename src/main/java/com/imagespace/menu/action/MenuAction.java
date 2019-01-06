@@ -5,7 +5,7 @@ import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.menu.model.Menu;
-import com.imagespace.menu.model.MenuVo;
+import com.imagespace.menu.model.vo.MenuVo;
 import com.imagespace.menu.service.MenuService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;

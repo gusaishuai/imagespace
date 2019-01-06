@@ -4,13 +4,13 @@ import com.imagespace.user.dao.UserDao;
 import com.imagespace.user.model.User;
 import com.imagespace.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
  * @author gusaishuai
  * @since 18/12/16
  */
-@Service
+@Component
 public class UserServiceImpl implements UserService {
 
     @Autowired

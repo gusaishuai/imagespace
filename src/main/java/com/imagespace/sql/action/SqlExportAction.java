@@ -6,7 +6,7 @@ import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.sql.model.SqlKeyWord;
-import com.imagespace.sql.service.impl.SqlService;
+import com.imagespace.sql.service.SqlService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

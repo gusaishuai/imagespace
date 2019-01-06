@@ -1,5 +1,6 @@
-package com.imagespace.menu.model;
+package com.imagespace.menu.model.vo;
 
+import com.imagespace.menu.model.Menu;
 import lombok.Getter;
 import lombok.Setter;
 

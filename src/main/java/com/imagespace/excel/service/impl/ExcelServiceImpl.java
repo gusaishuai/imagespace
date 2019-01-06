@@ -1,6 +1,6 @@
 package com.imagespace.excel.service.impl;
 
-import com.alibaba.excel.ExcelReader;
+import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
@@ -8,21 +8,26 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.imagespace.common.model.Pagination;
 import com.imagespace.common.service.impl.RedisPool;
-import com.imagespace.excel.model.ExcelExpr;
-import com.imagespace.excel.model.ExcelExprModel;
-import com.imagespace.excel.model.ExcelModel;
+import com.imagespace.excel.dao.ExcelFilterRuleDao;
+import com.imagespace.excel.dao.ExcelFilterRuleDetailDao;
+import com.imagespace.excel.model.*;
+import com.imagespace.excel.service.ExcelService;
 import com.imagespace.excel.util.ExcelColIndexUtil;
 import com.imagespace.excel.util.RpnUtil;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -31,34 +36,45 @@ import java.util.stream.Collectors;
  * @author gusaishuai
  * @since 2018/12/29
  */
-@Service
-public class ExcelService {
+@Component
+public class ExcelServiceImpl implements ExcelService {
 
     private final RedisPool redisPool;
+    private final ExcelFilterRuleDao excelFilterRuleDao;
+    private final ExcelFilterRuleDetailDao excelFilterRuleDetailDao;
 
     @Autowired
-    public ExcelService(RedisPool redisPool) {
+    public ExcelServiceImpl(RedisPool redisPool,
+                            ExcelFilterRuleDao excelFilterRuleDao,
+                            ExcelFilterRuleDetailDao excelFilterRuleDetailDao) {
         this.redisPool = redisPool;
+        this.excelFilterRuleDao = excelFilterRuleDao;
+        this.excelFilterRuleDetailDao = excelFilterRuleDetailDao;
     }
 
+    /**
+     * 通过过滤规则查询EXCEL
+     */
     public ExcelModel filterExcel(File excel, String expr, int sheetNum, int topNum, int pageNo) {
         FileInputStream fis = null;
         try {
             ExcelModel excelModel = new ExcelModel();
             //文件名（即文件MD5）+表达式 作为key
-            String key = String.format("%s_%s_%s_%s", excel.getName(), sheetNum, topNum,
+            String key = String.format("%s_%s_%s", excel.getName(), sheetNum,
                     StringUtils.isBlank(expr) ? "" : DigestUtils.md5Hex(expr));
+
             //缓存数据
-            String value = redisPool.get(key);
-            if (StringUtils.isNotBlank(value)) {
-                List<LinkedHashMap<String, String>> excelDataMapList = JSON.parseObject(
-                        value, new TypeReference<List<LinkedHashMap<String, String>>>(){});
-                Pagination pagination = new Pagination(pageNo, excelDataMapList.size());
+            if (redisPool.keyExist(key)) {
+                Pagination pagination = new Pagination(pageNo, redisPool.listLength(key));
+                List<String> excelDataList = redisPool.getList(key, pagination.start(topNum), pagination.end());
                 excelModel.setPagination(pagination);
-                excelModel.setExcelDataList(new ArrayList<>(
-                        excelDataMapList.subList(pagination.start(), pagination.end())));
+                if (CollectionUtils.isNotEmpty(excelDataList)) {
+                    excelModel.setExcelDataList(excelDataList.stream().map(r -> JSON.parseObject(r,
+                            new TypeReference<LinkedHashMap<String, String>>() {})).collect(Collectors.toList()));
+                }
                 return excelModel;
             }
+
             //表达式替换json
             ExcelExprModel excelExprModel = exprReplaceJson(expr);
             //生成逆波兰表达式
@@ -67,18 +83,23 @@ public class ExcelService {
             List<Map<String, String>> excelDataList = new ArrayList<>();
 
             fis = FileUtils.openInputStream(excel);
+
             //读取EXCEL
-            new ExcelReader(fis, null, new AnalysisEventListener<List<String>>() {
+            EasyExcelFactory.readBySax(fis, new Sheet(sheetNum, 0),
+                    new AnalysisEventListener<List<String>>() {
                 @Override
                 public void invoke(List<String> colList, AnalysisContext context) {
+                    //去除空的列
+                    List<String> noNullValueColList = colList.stream()
+                            .filter(StringUtils::isNotBlank).collect(Collectors.toList());
                     int currentRowNum = context.getCurrentRowNum() + 1;
                     //是否符合表达式
                     boolean match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
                         ExcelExpr excelExpr = excelExprModel .getExcelExprList().get(position);
-                        if (excelExpr.isMatch()) {
-                            return colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                        if (excelExpr.isMatched()) {
+                            return noNullValueColList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
                         } else {
-                            return !colList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                            return !noNullValueColList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
                         }
                     });
                     //把满足的行过滤出来
@@ -86,7 +107,7 @@ public class ExcelService {
                         int i = 1;
                         Map<String, String> colMap = new LinkedHashMap<>();
                         colMap.put("row", String.valueOf(currentRowNum));
-                        for (String col : colList) {
+                        for (String col : noNullValueColList) {
                             colMap.put(ExcelColIndexUtil.getColIndex(i), col);
                             i++;
                         }
@@ -97,14 +118,17 @@ public class ExcelService {
                 public void doAfterAllAnalysed(AnalysisContext context) {
 
                 }
-            }, false).read(new Sheet(sheetNum, topNum));
+            });
 
-            //放入缓存
-            redisPool.set(key, JSON.toJSONString(excelDataList), 24 * 60 * 60);
+            if (CollectionUtils.isNotEmpty(excelDataList)) {
+                //放入缓存
+                redisPool.setList(key, excelDataList.stream()
+                        .map(JSON::toJSONString).collect(Collectors.toList()), 24 * 60 * 60);
+            }
 
             Pagination pagination = new Pagination(pageNo, excelDataList.size());
             excelModel.setPagination(pagination);
-            excelModel.setExcelDataList(excelDataList.subList(pagination.start(), pagination.end()));
+            excelModel.setExcelDataList(excelDataList.subList(pagination.start(topNum), pagination.end()));
 
             return excelModel;
         } catch (IOException e) {
@@ -118,6 +142,22 @@ public class ExcelService {
                 }
             }
         }
+    }
+
+    /**
+     * 获取用户下的过滤规则
+     */
+    @Override
+    public List<ExcelFilterRule> getFilterRuleList(Long userId) {
+        return excelFilterRuleDao.queryByUserId(userId);
+    }
+
+    /**
+     * 根据规则ID查询规则列表
+     */
+    @Override
+    public List<ExcelFilterRuleDetail> getFilterRuleDetailList(Long ruleId) {
+        return excelFilterRuleDetailDao.queryByRuleId(ruleId);
     }
 
     /**

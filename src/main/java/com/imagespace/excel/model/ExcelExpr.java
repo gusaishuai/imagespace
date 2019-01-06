@@ -9,7 +9,7 @@ public class ExcelExpr {
     //列数
     private int colNum;
     //是否满足
-    private boolean match;
+    private boolean matched;
     //值或正则表达式
     private String regex;
 
@@ -21,12 +21,12 @@ public class ExcelExpr {
         this.colNum = colNum;
     }
 
-    public boolean isMatch() {
-        return match;
+    public boolean isMatched() {
+        return matched;
     }
 
-    public void setMatch(boolean match) {
-        this.match = match;
+    public void setMatched(boolean matched) {
+        this.matched = matched;
     }
 
     public String getRegex() {

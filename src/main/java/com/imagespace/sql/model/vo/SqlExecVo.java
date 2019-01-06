@@ -1,4 +1,4 @@
-package com.imagespace.sql.model;
+package com.imagespace.sql.model.vo;
 
 import com.imagespace.common.model.Pagination;
 import lombok.Getter;

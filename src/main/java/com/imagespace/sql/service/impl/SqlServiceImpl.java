@@ -3,7 +3,8 @@ package com.imagespace.sql.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.imagespace.common.model.Pagination;
 import com.imagespace.common.service.impl.RedisPool;
-import com.imagespace.sql.model.SqlExecVo;
+import com.imagespace.sql.model.vo.SqlExecVo;
+import com.imagespace.sql.service.SqlService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.*;
  * @since 2018/12/16
  */
 @Component
-public class SqlService {
+public class SqlServiceImpl implements SqlService {
 
     @Value("${sql.table.schema}")
     private String tableSchema;
@@ -30,7 +31,7 @@ public class SqlService {
     private final RedisPool redisPool;
 
     @Autowired
-    public SqlService(JdbcTemplate jdbcTemplate, RedisPool redisPool) {
+    public SqlServiceImpl(JdbcTemplate jdbcTemplate, RedisPool redisPool) {
         this.jdbcTemplate = jdbcTemplate;
         // 10秒超时
         this.jdbcTemplate.setQueryTimeout(10);

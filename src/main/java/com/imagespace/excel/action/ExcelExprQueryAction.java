@@ -9,7 +9,7 @@ import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.excel.model.ExcelExpr;
 import com.imagespace.excel.model.ExcelModel;
 import com.imagespace.excel.model.RpnPattern;
-import com.imagespace.excel.service.impl.ExcelService;
+import com.imagespace.excel.service.ExcelService;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +55,7 @@ public class ExcelExprQueryAction implements ICallApi {
             //列数
             String[] colNum = request.getParameterValues("colNum[]");
             //满足条件 1-满足 0-不满足
-            String[] match = request.getParameterValues("match[]");
+            String[] matched = request.getParameterValues("matched[]");
             //值或正则表达式
             String[] regex = request.getParameterValues("regex[]");
             //右括号，可多个，如：))，整体的表达式中，左括号必须和右括号的数量一致
@@ -104,11 +104,11 @@ public class ExcelExprQueryAction implements ICallApi {
                 if (exprRowList.stream().anyMatch(r -> StringUtils.isBlank(colNum[r]) || !StringUtils.isNumeric(colNum[r]))) {
                     throw new IllegalArgumentException("#列数#存在为空或非数字的行");
                 }
-                if (match == null || maxExprRow != match.length) {
+                if (matched == null || maxExprRow != matched.length) {
                     throw new IllegalArgumentException("#满足条件#的数据不正确");
                 }
-                if (exprRowList.stream().anyMatch(r -> StringUtils.isBlank(match[r])
-                        || (!StringUtils.equals("0", match[r]) && !StringUtils.equals("1", match[r])))) {
+                if (exprRowList.stream().anyMatch(r -> StringUtils.isBlank(matched[r])
+                        || (!StringUtils.equals("0", matched[r]) && !StringUtils.equals("1", matched[r])))) {
                     throw new IllegalArgumentException("#满足条件#存在为空或非法字符的行");
                 }
                 if (regex == null || maxExprRow != regex.length) {
@@ -136,7 +136,7 @@ public class ExcelExprQueryAction implements ICallApi {
                     String conjValue = conj[exprRow];
                     if (row == exprRowList.size() - 1) {
                         if (StringUtils.isNotBlank(conjValue)) {
-                            throw new IllegalArgumentException("最后一行规则请不要加#连接符（并且、或者）#");
+                            throw new IllegalArgumentException("最后一行规则不能有#连接符（并且、或者）#");
                         }
                     } else {
                         if (StringUtils.isBlank(conjValue)) {
@@ -159,7 +159,7 @@ public class ExcelExprQueryAction implements ICallApi {
                     exprSb.append(StringUtils.isBlank(leftBracketValue) ? "" : leftBracketValue);
                     ExcelExpr excelExpr = new ExcelExpr();
                     excelExpr.setColNum(Integer.valueOf(colNum[exprRow]));
-                    excelExpr.setMatch(StringUtils.equals("1", match[exprRow]));
+                    excelExpr.setMatched(StringUtils.equals("1", matched[exprRow]));
                     excelExpr.setRegex(regex[exprRow]);
                     exprSb.append(JSON.toJSONString(excelExpr));
                     exprSb.append(StringUtils.isBlank(rightBracketValue) ? "" : rightBracketValue);
