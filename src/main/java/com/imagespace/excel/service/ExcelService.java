@@ -24,4 +24,9 @@ public interface ExcelService {
      */
     List<ExcelFilterRuleDetail> getFilterRuleDetailList(Long ruleId);
 
+    /**
+     * 过滤规则更新
+     */
+    void updateFilterRule(ExcelFilterRule filterRule, List<ExcelFilterRuleDetail> filterRuleDetailList);
+
 }
