@@ -56,6 +56,9 @@ public class ExcelFilterRuleUpdateAction implements ICallApi {
             if (StringUtils.isBlank(filterRuleName)) {
                 throw new IllegalArgumentException("过滤规则名称不能为空");
             }
+            if (StringUtils.length(filterRuleName) > 128) {
+                throw new IllegalArgumentException("过滤规则名称过长，请设置小于128个字符");
+            }
             if (exprRows == null || exprRows.length == 0) {
                 throw new IllegalArgumentException("至少要存在一条过滤规则");
             }

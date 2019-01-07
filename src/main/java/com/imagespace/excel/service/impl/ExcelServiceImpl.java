@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -167,7 +168,20 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     @Transactional
     public void updateFilterRule(ExcelFilterRule filterRule, List<ExcelFilterRuleDetail> filterRuleDetailList) {
-
+        int count = excelFilterRuleDao.countByName(filterRule.getName(), filterRule.getUserId());
+        if (count > 0) {
+            throw new IllegalArgumentException(String.format("规则名称：%s 已经存在", filterRule.getName()));
+        }
+        try {
+            //更新规则名称
+            excelFilterRuleDao.insert(filterRule);
+            filterRuleDetailList.forEach(r -> r.setRuleId(filterRule.getId()));
+            //更新规则详细
+            excelFilterRuleDetailDao.insertBatch(filterRuleDetailList);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new RuntimeException(e);
+        }
     }
 
     /**
