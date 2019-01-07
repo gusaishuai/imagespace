@@ -11,4 +11,11 @@
         SELECT <include refid="all_columns"/> FROM t_excel_filter_rule WHERE user_id = #{userId}
     </select>
 
+    <insert id="insert" parameterType="com.imagespace.excel.model.ExcelFilterRule" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_excel_filter_rule
+            (name, user_id)
+        VALUES
+            (#{item.name}, #{item.userId})
+    </insert>
+    
 </mapper>

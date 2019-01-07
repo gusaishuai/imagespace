@@ -2,6 +2,7 @@ package com.imagespace.excel.dao;
 
 import com.imagespace.excel.model.ExcelFilterRuleDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -13,5 +14,7 @@ import java.util.List;
 public interface ExcelFilterRuleDetailDao {
 
     List<ExcelFilterRuleDetail> queryByRuleId(Long ruleId);
+
+    void insertBatch(@Param("itemList") List<ExcelFilterRuleDetail> itemList);
 
 }

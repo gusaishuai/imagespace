@@ -11,4 +11,13 @@
         SELECT <include refid="all_columns"/> FROM t_excel_filter_rule_detail WHERE rule_id = #{ruleId}
     </select>
 
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO t_excel_filter_rule_detail
+            (rule_id, left_bracket, col_num, matched, regex, right_bracket, conj)
+        VALUES
+        <foreach collection="itemList" item="item" separator=",">
+            (#{item.ruleId}, #{item.leftBracket}, #{item.colNum}, #{item.matched}, #{item.regex}, #{item.rightBracket}, #{item.conj})
+        </foreach>
+    </insert>
+
 </mapper>

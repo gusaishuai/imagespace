@@ -14,4 +14,6 @@ public interface ExcelFilterRuleDao {
 
     List<ExcelFilterRule> queryByUserId(Long userId);
 
+    void insert(ExcelFilterRule filterRule);
+
 }

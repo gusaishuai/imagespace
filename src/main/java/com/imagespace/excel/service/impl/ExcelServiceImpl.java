@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -158,6 +159,15 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public List<ExcelFilterRuleDetail> getFilterRuleDetailList(Long ruleId) {
         return excelFilterRuleDetailDao.queryByRuleId(ruleId);
+    }
+
+    /**
+     * 更新规则
+     */
+    @Override
+    @Transactional
+    public void updateFilterRule(ExcelFilterRule filterRule, List<ExcelFilterRuleDetail> filterRuleDetailList) {
+
     }
 
     /**
