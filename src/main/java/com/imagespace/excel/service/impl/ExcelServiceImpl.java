@@ -185,6 +185,23 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     /**
+     * 删除规则
+     */
+    @Override
+    @Transactional
+    public void deleteFilterRule(Long ruleId) {
+        try {
+            //删除规则名称
+            excelFilterRuleDao.deleteById(ruleId);
+            //删除规则详细
+            excelFilterRuleDetailDao.deleteByRuleId(ruleId);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * 表达式替换json
      */
     private ExcelExprModel exprReplaceJson(String expr) {

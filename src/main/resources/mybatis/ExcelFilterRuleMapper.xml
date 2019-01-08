@@ -21,5 +21,9 @@
         VALUES
             (#{name}, #{userId})
     </insert>
+
+    <delete id="deleteById">
+        DELETE FROM t_excel_filter_rule WHERE id = #{id}
+    </delete>
     
 </mapper>

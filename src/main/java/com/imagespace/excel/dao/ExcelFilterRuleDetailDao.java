@@ -17,4 +17,6 @@ public interface ExcelFilterRuleDetailDao {
 
     void insertBatch(@Param("itemList") List<ExcelFilterRuleDetail> itemList);
 
+    void deleteByRuleId(Long ruleId);
+
 }

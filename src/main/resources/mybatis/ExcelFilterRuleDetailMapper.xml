@@ -20,4 +20,8 @@
         </foreach>
     </insert>
 
+    <delete id="deleteByRuleId">
+        DELETE FROM t_excel_filter_rule_detail WHERE rule_id = #{ruleId}
+    </delete>
+
 </mapper>

@@ -19,4 +19,6 @@ public interface ExcelFilterRuleDao {
 
     void insert(ExcelFilterRule filterRule);
 
+    void deleteById(Long ruleId);
+
 }

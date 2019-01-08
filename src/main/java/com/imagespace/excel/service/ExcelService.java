@@ -29,4 +29,9 @@ public interface ExcelService {
      */
     void updateFilterRule(ExcelFilterRule filterRule, List<ExcelFilterRuleDetail> filterRuleDetailList);
 
+    /**
+     * 过滤规则删除
+     */
+    void deleteFilterRule(Long ruleId);
+
 }
