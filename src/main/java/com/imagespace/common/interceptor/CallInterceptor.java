@@ -1,4 +1,4 @@
-package com.imagespace.common.controller;
+package com.imagespace.common.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.imagespace.common.model.CallResult;
