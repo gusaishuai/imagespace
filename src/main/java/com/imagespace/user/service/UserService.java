@@ -1,6 +1,7 @@
 package com.imagespace.user.service;
 
 import com.imagespace.common.model.Page;
+import com.imagespace.common.model.Pagination;
 import com.imagespace.user.model.User;
 
 /**
@@ -15,5 +16,5 @@ public interface UserService {
 
     void updatePwd(Long userId, String password);
 
-    Page<User> getUserByPage(String loginName, int pageNo);
+    Page<User> queryUserByPage(String loginName, Pagination pagination);
 }

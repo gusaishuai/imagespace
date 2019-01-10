@@ -1,11 +1,14 @@
 package com.imagespace.user.service.impl;
 
 import com.imagespace.common.model.Page;
+import com.imagespace.common.model.Pagination;
 import com.imagespace.user.dao.UserDao;
 import com.imagespace.user.model.User;
 import com.imagespace.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author gusaishuai
@@ -33,8 +36,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getUserByPage(String loginName, int pageNo) {
-        return null;
+    public Page<User> queryUserByPage(String loginName, Pagination pagination) {
+        List<User> userList = userDao.queryUserByPage(loginName, pagination);
+        Page<User> userPage = new Page<>();
+        userPage.setPageNo(pagination.getPageNo());
+        userPage.setPageSize(pagination.getPageSize());
+        userPage.setTotalCount(pagination.getTotalCount());
+        userPage.setList(userList);
+        return userPage;
     }
 
 }

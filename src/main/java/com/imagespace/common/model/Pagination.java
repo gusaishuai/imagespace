@@ -22,6 +22,10 @@ public class Pagination {
 		this.totalCount = totalCount;
 	}
 
+	public Pagination(int pageNo) {
+		this.pageNo = pageNo;
+	}
+
 	public int start() {
 		if (pageNo > 0) {
 			int start = (pageNo - 1) * pageSize;

@@ -20,11 +20,8 @@ public class Page<T> {
     /**
      * 每页展示
      */
-    private int pageSize = 15;
+    private int pageSize;
     private int totalCount;
     private List<T> list;
 
-    public Page(int pageNo) {
-        this.pageNo = pageNo;
-    }
 }

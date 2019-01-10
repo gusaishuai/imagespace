@@ -2,6 +2,7 @@ package com.imagespace.user.action;
 
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.Page;
+import com.imagespace.common.model.Pagination;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
@@ -38,10 +39,10 @@ public class UserQueryAction implements ICallApi {
             //登录名
             String loginName = request.getParameter("loginName");
             //分页查询用户信息列表
-            Page<User> userPage = userService.getUserByPage(loginName, pageNo);
+            Page<User> userPage = userService.queryUserByPage(loginName, new Pagination(pageNo));
             //构建返回参数
-            List<UserVo> voList = buildVo(userPage.getList());
-            return new CallResult(voList);
+            Page<UserVo> voPage = buildVo(userPage);
+            return new CallResult(voPage);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
@@ -50,10 +51,15 @@ public class UserQueryAction implements ICallApi {
         }
     }
 
-    private List<UserVo> buildVo(List<User> userList) {
+    private Page<UserVo> buildVo(Page<User> userPage) {
+        Page<UserVo> voPage = new Page<>();
+        voPage.setPageNo(userPage.getPageNo());
+        voPage.setPageSize(userPage.getPageSize());
+        voPage.setTotalCount(userPage.getTotalCount());
+
         List<UserVo> voList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(userList)) {
-            userList.forEach(r -> {
+        if (CollectionUtils.isNotEmpty(userPage.getList())) {
+            userPage.getList().forEach(r -> {
                 UserVo vo = new UserVo();
                 vo.setId(r.getId());
                 vo.setLoginName(r.getLoginName());
@@ -61,7 +67,8 @@ public class UserQueryAction implements ICallApi {
                 voList.add(vo);
             });
         }
-        return voList;
+        voPage.setList(voList);
+        return voPage;
     }
 
 }
