@@ -60,6 +60,7 @@ public class PageInterceptor implements Interceptor {
         ResultSet rs = null;
         try {
             countStmt = connection.prepareStatement(countSql);
+
             rs = countStmt.executeQuery();
             int totalCount = 0;
             if (rs.next()) {
@@ -67,14 +68,17 @@ public class PageInterceptor implements Interceptor {
             }
             pagination.setTotalCount(totalCount);
         } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             try {
                 rs.close();
             } catch (SQLException e) {
+                e.printStackTrace();
             }
             try {
                 countStmt.close();
             } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
