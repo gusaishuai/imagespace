@@ -65,10 +65,14 @@ public class ExcelServiceImpl implements ExcelService {
             String key = String.format("%s_%s_%s", excel.getName(), sheetNum,
                     StringUtils.isBlank(expr) ? "" : DigestUtils.md5Hex(expr));
 
+            Pagination pagination = new Pagination(pageNo, 15);
             //缓存数据
             if (redisPool.keyExist(key)) {
-                Pagination pagination = new Pagination(pageNo, redisPool.listLength(key));
-                List<String> excelDataList = redisPool.getList(key, pagination.start(topNum), pagination.end());
+                int totalCount = redisPool.listLength(key);
+                pagination.setTotalCount(totalCountOffset(totalCount, topNum));
+                //需要过滤表头的行数
+                List<String> excelDataList = redisPool.getList(key,
+                        startOffset(pagination.start(), topNum, totalCount), endOffset(pagination.end(), topNum, totalCount));
                 excelModel.setPagination(pagination);
                 if (CollectionUtils.isNotEmpty(excelDataList)) {
                     excelModel.setExcelDataList(excelDataList.stream().map(r -> JSON.parseObject(r,
@@ -127,10 +131,11 @@ public class ExcelServiceImpl implements ExcelService {
                 redisPool.setList(key, excelDataList.stream()
                         .map(JSON::toJSONString).collect(Collectors.toList()), 24 * 60 * 60);
             }
-
-            Pagination pagination = new Pagination(pageNo, excelDataList.size());
+            int totalCount = excelDataList.size();
+            pagination.setTotalCount(totalCountOffset(totalCount, topNum));
             excelModel.setPagination(pagination);
-            excelModel.setExcelDataList(excelDataList.subList(pagination.start(topNum), pagination.end()));
+            excelModel.setExcelDataList(excelDataList.subList(
+                    startOffset(pagination.start(), topNum, totalCount), endOffset(pagination.end(), topNum, totalCount)));
 
             return excelModel;
         } catch (IOException e) {
@@ -223,6 +228,18 @@ public class ExcelServiceImpl implements ExcelService {
         excelExprModel.setExpr(sb.toString());
         excelExprModel.setExcelExprList(excelExprList);
         return excelExprModel;
+    }
+
+    private int totalCountOffset(int totalCount, int offset) {
+        return totalCount - offset > 0 ? totalCount - offset : 0;
+    }
+
+    private int startOffset(int start, int offset, int totalCount) {
+        return start + offset > totalCount ? totalCount : start + offset;
+    }
+
+    private int endOffset(int end, int offset, int totalCount) {
+        return end + offset > totalCount ? totalCount : end + offset;
     }
     
 }

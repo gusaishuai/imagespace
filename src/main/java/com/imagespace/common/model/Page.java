@@ -24,4 +24,9 @@ public class Page<T> {
     private int totalCount;
     private List<T> list;
 
+    public Page(int pageNo, int pageSize) {
+        this.pageNo = pageNo;
+        this.pageSize = pageSize;
+    }
+
 }

@@ -39,7 +39,7 @@ public class UserQueryAction implements ICallApi {
             //登录名
             String loginName = request.getParameter("loginName");
             //分页查询用户信息列表
-            Page<User> userPage = userService.queryUserByPage(loginName, new Pagination(pageNo));
+            Page<User> userPage = userService.queryUserByPage(loginName, new Pagination(pageNo, 15));
             //构建返回参数
             Page<UserVo> voPage = buildVo(userPage);
             return new CallResult(voPage);
@@ -52,9 +52,7 @@ public class UserQueryAction implements ICallApi {
     }
 
     private Page<UserVo> buildVo(Page<User> userPage) {
-        Page<UserVo> voPage = new Page<>();
-        voPage.setPageNo(userPage.getPageNo());
-        voPage.setPageSize(userPage.getPageSize());
+        Page<UserVo> voPage = new Page<>(userPage.getPageNo(), userPage.getPageSize());
         voPage.setTotalCount(userPage.getTotalCount());
 
         List<UserVo> voList = new ArrayList<>();

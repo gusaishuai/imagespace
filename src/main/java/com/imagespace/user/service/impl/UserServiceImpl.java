@@ -38,9 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> queryUserByPage(String loginName, Pagination pagination) {
         List<User> userList = userDao.queryUserByPage(loginName, pagination);
-        Page<User> userPage = new Page<>();
-        userPage.setPageNo(pagination.getPageNo());
-        userPage.setPageSize(pagination.getPageSize());
+        Page<User> userPage = new Page<>(pagination.getPageNo(), pagination.getPageSize());
         userPage.setTotalCount(pagination.getTotalCount());
         userPage.setList(userList);
         return userPage;

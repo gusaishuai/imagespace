@@ -44,7 +44,8 @@ public class SqlServiceImpl implements SqlService {
     public SqlExecVo select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
         int totalCount = getTotalCount(sql);
-        Pagination pagination = new Pagination(pageNo, totalCount);
+        Pagination pagination = new Pagination(pageNo, 15);
+        pagination.setTotalCount(totalCount);
         List<Map<String, Object>> resultList;
         if (totalCount == 0) {
             resultList = new ArrayList<>();
@@ -72,7 +73,8 @@ public class SqlServiceImpl implements SqlService {
     public SqlExecVo update(String sql) {
         // 更新，包含插入、更新和删除
         int count = jdbcTemplate.update(StringUtils.trim(sql).split(";")[0]);
-        Pagination pagination = new Pagination(1, 1);
+        Pagination pagination = new Pagination(1, 15);
+        pagination.setTotalCount(1);
         Map<String, Object> map = new HashMap<>();
         map.put("count", count);
         map.put("time", DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));

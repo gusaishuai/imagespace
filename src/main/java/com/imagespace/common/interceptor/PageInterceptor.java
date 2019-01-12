@@ -40,7 +40,7 @@ public class PageInterceptor implements Interceptor {
             metaStatementHandler = SystemMetaObject.forObject(object);
         }
         MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
-        if (mappedStatement.getId().matches(".*ByPage$")) {
+        if (metaStatementHandler.hasGetter("delegate.boundSql.parameterObject.pagination")) {
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
             String sql = boundSql.getSql();
             Pagination pagination = (Pagination) metaStatementHandler.getValue("delegate.boundSql.parameterObject.pagination");
@@ -54,6 +54,9 @@ public class PageInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
+    /**
+     * 计算总数
+     */
     private int sqlCount(String sql, BoundSql boundSql, Connection connection,
                          MappedStatement mappedStatement) throws SQLException {
         //组装总数sql
