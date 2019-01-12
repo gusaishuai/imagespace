@@ -1,15 +1,15 @@
 package com.imagespace.common.interceptor;
 
 import com.imagespace.common.model.Pagination;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
-import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,64 +21,76 @@ import java.util.Properties;
  * @author gusaishuai
  * @since 2019/1/10
  */
+@Slf4j
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 public class PageInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
-        MetaObject metaStatementHandler = MetaObject.forObject(statementHandler, new DefaultObjectFactory(),
-                new DefaultObjectWrapperFactory(), new DefaultReflectorFactory());
+        MetaObject metaStatementHandler = SystemMetaObject.forObject(statementHandler);
+        // 分离代理对象链(由于目标类可能被多个拦截器拦截，从而形成多次代理，通过下面的两次循环可以分离出最原始的的目标类)
+        while (metaStatementHandler.hasGetter("h")) {
+            Object object = metaStatementHandler.getValue("h");
+            metaStatementHandler = SystemMetaObject.forObject(object);
+        }
+        // 分离最后一个代理对象的目标类
+        while (metaStatementHandler.hasGetter("target")) {
+            Object object = metaStatementHandler.getValue("target");
+            metaStatementHandler = SystemMetaObject.forObject(object);
+        }
         MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
         if (mappedStatement.getId().matches(".*ByPage$")) {
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
-            Object parameterObject = boundSql.getParameterObject();
-            if (parameterObject == null) {
-                throw new NullPointerException("parameterObject is null!");
-            } else {
-                Pagination pagination = (Pagination) metaStatementHandler.getValue("delegate.boundSql.parameterObject.pagination");
-                String sql = boundSql.getSql();
-                //物理分页
-                String pageSql = sql + " limit " + pagination.start() + "," + pagination.getPageSize();
-                metaStatementHandler.setValue("delegate.boundSql.sql", pageSql);
-                //采用物理分页后，就不需要mybatis的内存分页了，所以重置下面的两个参数
-                metaStatementHandler.setValue("delegate.rowBounds.offset", RowBounds.NO_ROW_OFFSET);
-                metaStatementHandler.setValue("delegate.rowBounds.limit", RowBounds.NO_ROW_LIMIT);
-                Connection connection = (Connection) invocation.getArgs()[0];
-                //重设分页参数里的总页数等
-                setPage(sql, connection, mappedStatement, boundSql, pagination);
-            }
+            String sql = boundSql.getSql();
+            Pagination pagination = (Pagination) metaStatementHandler.getValue("delegate.boundSql.parameterObject.pagination");
+            String pageSql =  String.format("%s limit %s, %s", sql, pagination.start(), pagination.getPageSize());
+            //物理分页
+            metaStatementHandler.setValue("delegate.boundSql.sql", pageSql);
+            Connection connection = (Connection) invocation.getArgs()[0];
+            //重设分页参数里的总页数
+            pagination.setTotalCount(sqlCount(sql, boundSql, connection, mappedStatement));
         }
         return invocation.proceed();
     }
 
-    private void setPage(String sql, Connection connection, MappedStatement mappedStatement,
-                         BoundSql boundSql, Pagination pagination) {
-        // 记录总记录数
-        String countSql = "SELECT COUNT(1) FROM (" + sql + ") AS TOTAL";
+    private int sqlCount(String sql, BoundSql boundSql, Connection connection,
+                         MappedStatement mappedStatement) throws SQLException {
+        //组装总数sql
         PreparedStatement countStmt = null;
         ResultSet rs = null;
         try {
+            //统计总数
+            String countSql = String.format("SELECT COUNT(1) FROM (%s) AS TOTAL", sql);
             countStmt = connection.prepareStatement(countSql);
-
+            //此时的sql还没有where条件中参数的值，如：where id = ?
+            BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(),
+                    countSql, boundSql.getParameterMappings(), boundSql.getParameterObject());
+            //加上sql的where条件中带的参数，如：where id = 1234
+            ParameterHandler parameterHandler = new DefaultParameterHandler(
+                    mappedStatement, boundSql.getParameterObject(), countBoundSql);
+            parameterHandler.setParameters(countStmt);
+            //查询总数
             rs = countStmt.executeQuery();
             int totalCount = 0;
             if (rs.next()) {
                 totalCount = rs.getInt(1);
             }
-            pagination.setTotalCount(totalCount);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return totalCount;
         } finally {
             try {
-                rs.close();
+                if (rs != null) {
+                    rs.close();
+                }
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("PageInterceptor.sqlCount close rs error", e);
             }
             try {
-                countStmt.close();
+                if (countStmt != null) {
+                    countStmt.close();
+                }
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("PageInterceptor.sqlCount close countStmt error", e);
             }
         }
     }

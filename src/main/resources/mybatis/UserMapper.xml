@@ -22,7 +22,7 @@
     <select id="queryUserByPage" resultType="com.imagespace.user.model.User">
         SELECT <include refid="all_columns"/> FROM t_user WHERE 1 = 1
         <if test="loginName != null and loginName != ''">
-            AND login_name = #{loginName}
+            AND login_name like CONCAT('%', #{loginName}, '%')
         </if>
     </select>
 
