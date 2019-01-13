@@ -23,4 +23,7 @@ public interface UserService {
     void deleteUser(Long userId);
 
     void addUserMenu(Long userId, List<Long> menuIdList);
+
+    void addUser(User user);
+
 }

@@ -30,4 +30,15 @@
         DELETE FROM t_user WHERE id = #{id}
     </delete>
 
+    <select id="countByLoginName" resultType="int">
+        SELECT COUNT(1) FROM t_user WHERE login_name = #{loginName}
+    </select>
+
+    <insert id="insert" parameterType="com.imagespace.user.model.User" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO t_user
+            (login_name, password, nick)
+        VALUES
+            (#{loginName}, #{password}, #{nick})
+    </insert>
+
 </mapper>

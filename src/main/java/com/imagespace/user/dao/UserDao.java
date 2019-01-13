@@ -25,4 +25,7 @@ public interface UserDao {
 
     void deleteById(Long userId);
 
+    int countByLoginName(String loginName);
+
+    void insert(User user);
 }

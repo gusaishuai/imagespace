@@ -46,7 +46,7 @@ public class UserMenuAddAction implements ICallApi {
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
-            log.error("user.userDelete error", e);
+            log.error("user.addUserMenu error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         }
     }

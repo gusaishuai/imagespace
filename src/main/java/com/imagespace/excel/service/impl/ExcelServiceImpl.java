@@ -62,17 +62,15 @@ public class ExcelServiceImpl implements ExcelService {
         try {
             ExcelModel excelModel = new ExcelModel();
             //文件名（即文件MD5）+表达式 作为key
-            String key = String.format("%s_%s_%s", excel.getName(), sheetNum,
+            String key = String.format("%s_%s_%s_%s", excel.getName(), sheetNum, topNum,
                     StringUtils.isBlank(expr) ? "" : DigestUtils.md5Hex(expr));
 
             Pagination pagination = new Pagination(pageNo, 15);
             //缓存数据
             if (redisPool.keyExist(key)) {
-                int totalCount = redisPool.listLength(key);
-                pagination.setTotalCount(totalCountOffset(totalCount, topNum));
+                pagination.setTotalCount(redisPool.listLength(key));
                 //需要过滤表头的行数
-                List<String> excelDataList = redisPool.getList(key,
-                        startOffset(pagination.start(), topNum, totalCount), endOffset(pagination.end(), topNum, totalCount));
+                List<String> excelDataList = redisPool.getList(key, pagination.start(), pagination.end() - 1);
                 excelModel.setPagination(pagination);
                 if (CollectionUtils.isNotEmpty(excelDataList)) {
                     excelModel.setExcelDataList(excelDataList.stream().map(r -> JSON.parseObject(r,
@@ -91,7 +89,7 @@ public class ExcelServiceImpl implements ExcelService {
             fis = FileUtils.openInputStream(excel);
 
             //读取EXCEL
-            EasyExcelFactory.readBySax(fis, new Sheet(sheetNum, 0),
+            EasyExcelFactory.readBySax(fis, new Sheet(sheetNum, topNum),
                     new AnalysisEventListener<List<String>>() {
                 @Override
                 public void invoke(List<String> colList, AnalysisContext context) {
@@ -101,7 +99,10 @@ public class ExcelServiceImpl implements ExcelService {
                     int currentRowNum = context.getCurrentRowNum() + 1;
                     //是否符合表达式
                     boolean match = RpnUtil.calcRpnExpr(rpnExprArray, position -> {
-                        ExcelExpr excelExpr = excelExprModel .getExcelExprList().get(position);
+                        ExcelExpr excelExpr = excelExprModel.getExcelExprList().get(position);
+                        if (excelExpr.getColNum() > noNullValueColList.size()) {
+                            return false;
+                        }
                         if (excelExpr.isMatched()) {
                             return noNullValueColList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
                         } else {
@@ -131,11 +132,11 @@ public class ExcelServiceImpl implements ExcelService {
                 redisPool.setList(key, excelDataList.stream()
                         .map(JSON::toJSONString).collect(Collectors.toList()), 24 * 60 * 60);
             }
-            int totalCount = excelDataList.size();
-            pagination.setTotalCount(totalCountOffset(totalCount, topNum));
+            pagination.setTotalCount(excelDataList.size());
             excelModel.setPagination(pagination);
-            excelModel.setExcelDataList(excelDataList.subList(
-                    startOffset(pagination.start(), topNum, totalCount), endOffset(pagination.end(), topNum, totalCount)));
+            int start = pagination.start() > excelDataList.size() ? excelDataList.size() : pagination.start();
+            int end = pagination.end() > excelDataList.size() ? excelDataList.size() : pagination.end();
+            excelModel.setExcelDataList(excelDataList.subList(start, end));
 
             return excelModel;
         } catch (IOException e) {
@@ -228,18 +229,6 @@ public class ExcelServiceImpl implements ExcelService {
         excelExprModel.setExpr(sb.toString());
         excelExprModel.setExcelExprList(excelExprList);
         return excelExprModel;
-    }
-
-    private int totalCountOffset(int totalCount, int offset) {
-        return totalCount - offset > 0 ? totalCount - offset : 0;
-    }
-
-    private int startOffset(int start, int offset, int totalCount) {
-        return start + offset > totalCount ? totalCount : start + offset;
-    }
-
-    private int endOffset(int end, int offset, int totalCount) {
-        return end + offset > totalCount ? totalCount : end + offset;
     }
     
 }

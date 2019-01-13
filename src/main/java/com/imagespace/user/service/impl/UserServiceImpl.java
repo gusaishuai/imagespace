@@ -53,14 +53,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
-        userDao.deleteById(userId);
+        try {
+            userDao.deleteById(userId);
+            //删除用户拥有的菜单
+            userMenuDao.deleteByUserId(userId);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     @Transactional
     public void addUserMenu(Long userId, List<Long> menuIdList) {
         try {
+            //先删除，后插入
             userMenuDao.deleteByUserId(userId);
             if (CollectionUtils.isNotEmpty(menuIdList)) {
                 List<UserMenu> userMenuList = new ArrayList<>();
@@ -76,6 +85,15 @@ public class UserServiceImpl implements UserService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void addUser(User user) {
+        int count = userDao.countByLoginName(user.getLoginName());
+        if (count > 0) {
+            throw new IllegalArgumentException(String.format("用户名：%s 已经存在", user.getLoginName()));
+        }
+        userDao.insert(user);
     }
 
 }
