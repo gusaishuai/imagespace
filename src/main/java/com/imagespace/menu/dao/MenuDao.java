@@ -15,4 +15,5 @@ public interface MenuDao {
 
     List<Menu> queryByUserId(Long userId);
 
+    List<Menu> queryAll();
 }

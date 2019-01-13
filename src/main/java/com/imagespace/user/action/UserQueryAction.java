@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2019/1/10
  */
 @Slf4j
-@Service("user.userQuery")
+@Service("user.queryUser")
 public class UserQueryAction implements ICallApi {
 
     @Autowired

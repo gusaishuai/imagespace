@@ -8,4 +8,5 @@ public interface MenuService {
 
     List<Menu> queryByUserId(Long userId);
 
+    List<Menu> queryAll();
 }

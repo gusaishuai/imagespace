@@ -1,11 +1,13 @@
-package com.imagespace.user.action;
+package com.imagespace.menu.action;
 
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
+import com.imagespace.menu.model.Menu;
+import com.imagespace.menu.model.vo.OwnMenuVo;
+import com.imagespace.menu.service.MenuService;
 import com.imagespace.user.model.User;
-import com.imagespace.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,32 +15,29 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author gusaishuai
- * @since 19/1/12
+ * @since 18/12/22
  */
 @Slf4j
-@Service("user.deleteUser")
-public class UserDeleteAction implements ICallApi {
+@Service("menu.getOwnMenu")
+public class OwnMenuAction implements ICallApi {
 
     @Autowired
-    private UserService userService;
+    private MenuService menuService;
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
-            String userId = request.getParameter("userId");
-            if (StringUtils.isBlank(userId)) {
-                throw new IllegalArgumentException("用户ID为空");
-            }
-            //删除用户
-            userService.deleteUser(Long.valueOf(userId));
-            return new CallResult();
-        } catch (IllegalArgumentException e) {
-            return new CallResult(ResultCode.FAIL, e.getMessage());
+            List<Menu> menuList = menuService.queryByUserId(_user.getId());
+            OwnMenuVo vo = new OwnMenuVo();
+            vo.setMenuList(menuList);
+            vo.setNick(StringUtils.isNotBlank(_user.getNick()) ? _user.getNick() : _user.getLoginName());
+            return new CallResult(vo);
         } catch (Exception e) {
-            log.error("user.userDelete error", e);
+            log.error("menu.getMenu error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         }
     }

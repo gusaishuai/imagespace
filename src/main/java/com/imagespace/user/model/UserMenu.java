@@ -1,4 +1,4 @@
-package com.imagespace.menu.model.vo;
+package com.imagespace.user.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,9 +9,10 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class MenuVo {
+public class UserMenu {
 
     private Long id;
-    private String name;
+    private Long userId;
+    private Long menuId;
 
 }

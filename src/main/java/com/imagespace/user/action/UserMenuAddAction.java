@@ -13,14 +13,17 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author gusaishuai
- * @since 19/1/12
+ * @since 19/1/13
  */
 @Slf4j
-@Service("user.deleteUser")
-public class UserDeleteAction implements ICallApi {
+@Service("user.addUserMenu")
+public class UserMenuAddAction implements ICallApi {
 
     @Autowired
     private UserService userService;
@@ -32,8 +35,13 @@ public class UserDeleteAction implements ICallApi {
             if (StringUtils.isBlank(userId)) {
                 throw new IllegalArgumentException("用户ID为空");
             }
+            String[] menuIds = request.getParameterValues("menuIds[]");
+            List<Long> menuIdList = null;
+            if (menuIds != null && menuIds.length > 0) {
+                menuIdList = Arrays.stream(menuIds).map(Long::valueOf).collect(Collectors.toList());
+            }
             //删除用户
-            userService.deleteUser(Long.valueOf(userId));
+            userService.addUserMenu(Long.valueOf(userId), menuIdList);
             return new CallResult();
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());

@@ -3,8 +3,12 @@
 
 <mapper namespace="com.imagespace.menu.dao.MenuDao">
 
+    <sql id="all_columns" >
+        id, name, route, logo, sort
+    </sql>
+
     <sql id="all_columns_alias" >
-        t1.id, t1.name, t1.route, t1.logo
+        t1.id, t1.name, t1.route, t1.logo, t1.sort
     </sql>
 
     <select id="queryByUserId" resultType="com.imagespace.menu.model.Menu">
@@ -13,6 +17,12 @@
         WHERE t1.id = t2.menu_id
               AND t2.user_id = #{userId}
         ORDER BY t1.sort
+    </select>
+
+    <select id="queryAll" resultType="com.imagespace.menu.model.Menu">
+        SELECT <include refid="all_columns"/>
+        FROM t_menu
+        ORDER BY sort
     </select>
 
 </mapper>

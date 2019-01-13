@@ -23,4 +23,9 @@ public class MenuServiceImpl implements MenuService {
         return menuDao.queryByUserId(userId);
     }
 
+    @Override
+    public List<Menu> queryAll() {
+        return menuDao.queryAll();
+    }
+
 }
