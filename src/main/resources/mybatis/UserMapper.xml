@@ -26,4 +26,8 @@
         </if>
     </select>
 
+    <delete id="deleteById">
+        DELETE FROM t_user WHERE id = #{id}
+    </delete>
+
 </mapper>

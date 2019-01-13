@@ -23,4 +23,6 @@ public interface UserDao {
 
     List<User> queryUserByPage(@Param("loginName") String loginName, @Param("pagination") Pagination pagination);
 
+    void deleteById(Long userId);
+
 }

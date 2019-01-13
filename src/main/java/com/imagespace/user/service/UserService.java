@@ -17,4 +17,7 @@ public interface UserService {
     void updatePwd(Long userId, String password);
 
     Page<User> queryUserByPage(String loginName, Pagination pagination);
+
+    void deleteUser(Long userId);
+
 }
