@@ -1,6 +1,5 @@
 package com.imagespace.excel.model;
 
-import com.imagespace.excel.action.RPNPriority;
 import org.apache.commons.lang3.StringUtils;
 
 /**
