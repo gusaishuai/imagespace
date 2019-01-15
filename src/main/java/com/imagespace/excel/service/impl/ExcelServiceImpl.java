@@ -104,9 +104,9 @@ public class ExcelServiceImpl implements ExcelService {
                             return false;
                         }
                         if (excelExpr.isMatched()) {
-                            return noNullValueColList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                            return isMatch(noNullValueColList.get(excelExpr.getColNum() - 1), excelExpr.getRegex());
                         } else {
-                            return !noNullValueColList.get(excelExpr.getColNum() - 1).matches(excelExpr.getRegex());
+                            return !isMatch(noNullValueColList.get(excelExpr.getColNum() - 1), excelExpr.getRegex());
                         }
                     });
                     //把满足的行过滤出来
@@ -229,6 +229,14 @@ public class ExcelServiceImpl implements ExcelService {
         excelExprModel.setExpr(sb.toString());
         excelExprModel.setExcelExprList(excelExprList);
         return excelExprModel;
+    }
+
+    /**
+     * 是否满足条件
+     */
+    private boolean isMatch(String str, String regex) {
+        ExcelValidType validType = ExcelValidType.of(regex);
+        return validType != null ? validType.valid(str) : str.matches(regex);
     }
     
 }
