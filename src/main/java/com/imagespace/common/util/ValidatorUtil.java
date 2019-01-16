@@ -64,30 +64,23 @@ public class ValidatorUtil {
      * 验证手机号是否合法
      */
     public static boolean validPhone(String phone) {
-        if (StringUtils.isBlank(phone)) {
-            return false;
-        }
-        return phone.matches("^(1[3-9])\\d{9}$");
+        return StringUtils.isNotBlank(phone) && phone.matches("^(1[3-9])\\d{9}$");
     }
 
     /**
      * 验证email是否合法
      */
     public static boolean validEmail(String email) {
-        if (StringUtils.isBlank(email)) {
-            return false;
-        }
-        return email.matches("^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$");
+        return StringUtils.isNotBlank(email)
+                && email.matches("^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$");
     }
 
     /**
      * 验证身份证是否合法
      */
     public static boolean validIdNo(String idNo) {
-        if (StringUtils.isBlank(idNo)) {
-            return false;
-        }
-        return validIdNo18(idNo.trim()) || validIdNo15(idNo.trim());
+        return StringUtils.isNotBlank(idNo)
+                && (validIdNo18(idNo.trim()) || validIdNo15(idNo.trim()));
     }
 
     /**

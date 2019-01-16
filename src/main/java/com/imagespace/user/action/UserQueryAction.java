@@ -28,8 +28,12 @@ import java.util.List;
 @Service("user.queryUser")
 public class UserQueryAction implements ICallApi {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserQueryAction(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

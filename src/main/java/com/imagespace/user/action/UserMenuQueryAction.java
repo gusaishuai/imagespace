@@ -27,8 +27,12 @@ import java.util.stream.Collectors;
 @Service("user.queryUserMenu")
 public class UserMenuQueryAction implements ICallApi {
 
+    private final MenuService menuService;
+
     @Autowired
-    private MenuService menuService;
+    public UserMenuQueryAction(MenuService menuService) {
+        this.menuService = menuService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

@@ -26,8 +26,12 @@ import java.util.List;
 @Service("excel.filterRuleQuery")
 public class ExcelFilterRuleQueryAction implements ICallApi {
 
+    private final ExcelService excelService;
+
     @Autowired
-    private ExcelService excelService;
+    public ExcelFilterRuleQueryAction(ExcelService excelService) {
+        this.excelService = excelService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

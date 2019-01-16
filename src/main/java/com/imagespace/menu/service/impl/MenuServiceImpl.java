@@ -15,8 +15,12 @@ import java.util.List;
 @Component
 public class MenuServiceImpl implements MenuService {
 
+    private final MenuDao menuDao;
+
     @Autowired
-    private MenuDao menuDao;
+    public MenuServiceImpl(MenuDao menuDao) {
+        this.menuDao = menuDao;
+    }
 
     @Override
     public List<Menu> queryByUserId(Long userId) {

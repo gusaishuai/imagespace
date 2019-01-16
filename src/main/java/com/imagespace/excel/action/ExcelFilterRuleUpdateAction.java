@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,8 +29,12 @@ import java.util.stream.Collectors;
 @Service("excel.filterRuleUpdate")
 public class ExcelFilterRuleUpdateAction implements ICallApi {
 
+    private final ExcelService excelService;
+
     @Autowired
-    private ExcelService excelService;
+    public ExcelFilterRuleUpdateAction(ExcelService excelService) {
+        this.excelService = excelService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

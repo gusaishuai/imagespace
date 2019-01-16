@@ -25,8 +25,12 @@ import java.util.stream.Collectors;
 @Service("user.addUserMenu")
 public class UserMenuAddAction implements ICallApi {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserMenuAddAction(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

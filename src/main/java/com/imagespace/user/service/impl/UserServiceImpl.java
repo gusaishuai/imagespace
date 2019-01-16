@@ -23,10 +23,14 @@ import java.util.List;
 @Component
 public class UserServiceImpl implements UserService {
 
+    private final UserDao userDao;
+    private final UserMenuDao userMenuDao;
+
     @Autowired
-    private UserDao userDao;
-    @Autowired
-    private UserMenuDao userMenuDao;
+    public UserServiceImpl(UserDao userDao, UserMenuDao userMenuDao) {
+        this.userDao = userDao;
+        this.userMenuDao = userMenuDao;
+    }
 
     @Override
     public User queryById(Long id) {

@@ -25,8 +25,12 @@ import java.util.List;
 @Service("menu.getOwnMenu")
 public class OwnMenuAction implements ICallApi {
 
+    private final MenuService menuService;
+
     @Autowired
-    private MenuService menuService;
+    public OwnMenuAction(MenuService menuService) {
+        this.menuService = menuService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

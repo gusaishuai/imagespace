@@ -22,8 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 @Service("excel.filterRuleDelete")
 public class ExcelFilterRuleDeleteAction implements ICallApi {
 
+    private final ExcelService excelService;
+
     @Autowired
-    private ExcelService excelService;
+    public ExcelFilterRuleDeleteAction(ExcelService excelService) {
+        this.excelService = excelService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

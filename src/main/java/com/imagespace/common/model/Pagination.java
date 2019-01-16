@@ -26,8 +26,4 @@ public class Pagination {
 		return pageNo > 0 ? (pageNo - 1) * pageSize : 0;
 	}
 
-	public int end() {
-		return pageNo > 0 ? pageNo * pageSize : 0;
-	}
-
 }

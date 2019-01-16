@@ -22,8 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 @Service("menu.modifyPwd")
 public class ModifyPwdAction implements ICallApi {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public ModifyPwdAction(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

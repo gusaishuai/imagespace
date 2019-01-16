@@ -25,8 +25,12 @@ import java.util.Map;
 @Service("sql.getColumn")
 public class SqlColumnAction implements ICallApi {
 
+    private final SqlService sqlService;
+
     @Autowired
-    private SqlService sqlService;
+    public SqlColumnAction(SqlService sqlService) {
+        this.sqlService = sqlService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

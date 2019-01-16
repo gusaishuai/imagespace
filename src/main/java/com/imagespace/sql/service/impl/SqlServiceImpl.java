@@ -1,9 +1,8 @@
 package com.imagespace.sql.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.imagespace.common.model.Pagination;
+import com.imagespace.common.model.Page;
 import com.imagespace.common.service.impl.RedisPool;
-import com.imagespace.sql.model.vo.SqlExecVo;
 import com.imagespace.sql.service.SqlService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -41,20 +40,21 @@ public class SqlServiceImpl implements SqlService {
     /**
      * 查询
      */
-    public SqlExecVo select(String sql, int pageNo) {
+    public Page<Map<String, Object>> select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
         int totalCount = getTotalCount(sql);
-        Pagination pagination = new Pagination(pageNo, 15);
-        pagination.setTotalCount(totalCount);
+        Page<Map<String, Object>> execPage = new Page<>(pageNo, 15);
+        execPage.setTotalCount(totalCount);
         List<Map<String, Object>> resultList;
         if (totalCount == 0) {
             resultList = new ArrayList<>();
         } else {
             // 查询
-            sql = String.format("%s LIMIT %s,%s", sql, pagination.start(), pagination.getPageSize());
+            sql = String.format("%s LIMIT %s,%s", sql, execPage.start(), execPage.getPageSize());
             resultList = jdbcTemplate.queryForList(sql);
         }
-        return new SqlExecVo(pagination, resultList);
+        execPage.setList(resultList);
+        return execPage;
     }
 
     /**
@@ -70,16 +70,16 @@ public class SqlServiceImpl implements SqlService {
     /**
      * 新增、更新、删除
      */
-    public SqlExecVo update(String sql) {
+    public Page<Map<String, Object>> update(String sql) {
         // 更新，包含插入、更新和删除
         int count = jdbcTemplate.update(StringUtils.trim(sql).split(";")[0]);
-        Pagination pagination = new Pagination(1, 15);
-        pagination.setTotalCount(1);
+        Page<Map<String, Object>> execPage = new Page<>(1, 15);
+        execPage.setTotalCount(1);
         Map<String, Object> map = new HashMap<>();
         map.put("count", count);
         map.put("time", DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
-        List<Map<String, Object>> resultList = Collections.singletonList(map);
-        return new SqlExecVo(pagination, resultList);
+        execPage.setList(Collections.singletonList(map));
+        return execPage;
     }
 
     /**

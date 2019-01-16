@@ -22,8 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 @Service("user.deleteUser")
 public class UserDeleteAction implements ICallApi {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserDeleteAction(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

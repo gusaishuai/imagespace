@@ -6,7 +6,7 @@ import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.imagespace.common.model.Pagination;
+import com.imagespace.common.model.Page;
 import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.excel.dao.ExcelFilterRuleDao;
 import com.imagespace.excel.dao.ExcelFilterRuleDetailDao;
@@ -57,26 +57,24 @@ public class ExcelServiceImpl implements ExcelService {
     /**
      * 通过过滤规则查询EXCEL
      */
-    public ExcelModel filterExcel(File excel, String expr, int sheetNum, int topNum, int pageNo) {
+    public Page<Map<String, String>> filterExcel(File excel, String expr, int sheetNum, int topNum, int pageNo) {
         FileInputStream fis = null;
         try {
-            ExcelModel excelModel = new ExcelModel();
             //文件名（即文件MD5）+表达式 作为key
             String key = String.format("%s_%s_%s_%s", excel.getName(), sheetNum, topNum,
                     StringUtils.isBlank(expr) ? "" : DigestUtils.md5Hex(expr));
 
-            Pagination pagination = new Pagination(pageNo, 15);
+            Page<Map<String, String>> excelModelPage = new Page<>(pageNo, 15);
             //缓存数据
             if (redisPool.keyExist(key)) {
-                pagination.setTotalCount(redisPool.listLength(key));
+                excelModelPage.setTotalCount(redisPool.listLength(key));
                 //需要过滤表头的行数
-                List<String> excelDataList = redisPool.getList(key, pagination.start(), pagination.end() - 1);
-                excelModel.setPagination(pagination);
+                List<String> excelDataList = redisPool.getList(key, excelModelPage.start(), excelModelPage.end() - 1);
                 if (CollectionUtils.isNotEmpty(excelDataList)) {
-                    excelModel.setExcelDataList(excelDataList.stream().map(r -> JSON.parseObject(r,
+                    excelModelPage.setList(excelDataList.stream().map(r -> JSON.parseObject(r,
                             new TypeReference<LinkedHashMap<String, String>>() {})).collect(Collectors.toList()));
                 }
-                return excelModel;
+                return excelModelPage;
             }
 
             //表达式替换json
@@ -132,13 +130,12 @@ public class ExcelServiceImpl implements ExcelService {
                 redisPool.setList(key, excelDataList.stream()
                         .map(JSON::toJSONString).collect(Collectors.toList()), 24 * 60 * 60);
             }
-            pagination.setTotalCount(excelDataList.size());
-            excelModel.setPagination(pagination);
-            int start = pagination.start() > excelDataList.size() ? excelDataList.size() : pagination.start();
-            int end = pagination.end() > excelDataList.size() ? excelDataList.size() : pagination.end();
-            excelModel.setExcelDataList(excelDataList.subList(start, end));
+            excelModelPage.setTotalCount(excelDataList.size());
+            int start = excelModelPage.start() > excelDataList.size() ? excelDataList.size() : excelModelPage.start();
+            int end = excelModelPage.end() > excelDataList.size() ? excelDataList.size() : excelModelPage.end();
+            excelModelPage.setList(excelDataList.subList(start, end));
 
-            return excelModel;
+            return excelModelPage;
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         } finally {

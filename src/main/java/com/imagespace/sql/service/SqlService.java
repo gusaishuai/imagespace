@@ -1,6 +1,6 @@
 package com.imagespace.sql.service;
 
-import com.imagespace.sql.model.vo.SqlExecVo;
+import com.imagespace.common.model.Page;
 
 import java.util.List;
 import java.util.Map;
@@ -14,12 +14,12 @@ public interface SqlService {
     /**
      * 查询
      */
-    SqlExecVo select(String sql, int pageNo);
+    Page<Map<String, Object>> select(String sql, int pageNo);
 
     /**
      * 新增、更新、删除
      */
-    SqlExecVo update(String sql);
+    Page<Map<String, Object>> update(String sql);
 
     /**
      * 查询所有表

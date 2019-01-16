@@ -26,8 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 @Service("sql.exportSql")
 public class SqlExportAction implements ICallApi {
 
+    private final SqlService sqlService;
+
     @Autowired
-    private SqlService sqlService;
+    public SqlExportAction(SqlService sqlService) {
+        this.sqlService = sqlService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

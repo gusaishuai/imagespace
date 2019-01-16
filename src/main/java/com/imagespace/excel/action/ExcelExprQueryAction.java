@@ -3,12 +3,11 @@ package com.imagespace.excel.action;
 import com.alibaba.fastjson.JSON;
 import com.imagespace.common.model.CallResult;
 import com.imagespace.common.model.Constant;
+import com.imagespace.common.model.Page;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.excel.model.ExcelExpr;
-import com.imagespace.excel.model.ExcelModel;
-import com.imagespace.excel.model.RpnPattern;
 import com.imagespace.excel.service.ExcelService;
 import com.imagespace.excel.util.ExprValidUtil;
 import com.imagespace.user.model.User;
@@ -23,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,10 +34,15 @@ import java.util.stream.Collectors;
 @Service("excel.exprQuery")
 public class ExcelExprQueryAction implements ICallApi {
 
-    @Autowired
-    private ExcelService excelService;
     @Value("${excel.upload.tempdir}")
     private String tempDir;
+
+    private final ExcelService excelService;
+
+    @Autowired
+    public ExcelExprQueryAction(ExcelService excelService) {
+        this.excelService = excelService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
@@ -112,8 +116,8 @@ public class ExcelExprQueryAction implements ICallApi {
             int pageNo = StringUtils.isBlank(pageNoStr) ? 1 : Integer.valueOf(pageNoStr);
 
             //根据表达式过滤表格中符合的数据
-            ExcelModel excelModel = excelService.filterExcel(excel, expr, sheetNum, topNum, pageNo);
-            return new CallResult(excelModel);
+            Page<Map<String, String>> excelModelPage = excelService.filterExcel(excel, expr, sheetNum, topNum, pageNo);
+            return new CallResult(excelModelPage);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {

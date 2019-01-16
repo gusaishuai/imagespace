@@ -24,10 +24,15 @@ import javax.servlet.http.HttpServletResponse;
 @Service("user.addUser")
 public class UserAddAction implements ICallApi {
 
-    @Autowired
-    private UserService userService;
     @Value("${initial.password}")
     private String initialPassword;
+
+    private final UserService userService;
+
+    @Autowired
+    public UserAddAction(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

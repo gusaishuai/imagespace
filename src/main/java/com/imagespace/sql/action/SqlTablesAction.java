@@ -23,8 +23,12 @@ import java.util.List;
 @Service("sql.getAllTables")
 public class SqlTablesAction implements ICallApi {
 
+    private final SqlService sqlService;
+
     @Autowired
-    private SqlService sqlService;
+    public SqlTablesAction(SqlService sqlService) {
+        this.sqlService = sqlService;
+    }
 
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {

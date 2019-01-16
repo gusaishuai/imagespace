@@ -29,4 +29,12 @@ public class Page<T> {
         this.pageSize = pageSize;
     }
 
+    public int start() {
+        return pageNo > 0 ? (pageNo - 1) * pageSize : 0;
+    }
+
+    public int end() {
+        return pageNo > 0 ? pageNo * pageSize : 0;
+    }
+
 }
