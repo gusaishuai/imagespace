@@ -50,7 +50,7 @@ public class UserQueryAction implements ICallApi {
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
-            log.error("user.userQuery error", e);
+            log.error("user.queryUser error", e);
             return new CallResult(ResultCode.FAIL, ExceptionUtil.getExceptionTrace(e));
         }
     }

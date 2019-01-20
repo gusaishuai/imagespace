@@ -7,6 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 /**
  * @author gusaishuai
  * @since 2018/12/16
@@ -19,10 +22,11 @@ public class SpringContext implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
-        if (SpringContext.applicationContext != null) {
-            return;
-        }
         SpringContext.applicationContext = applicationContext;
+    }
+
+    public static String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotation) {
+        return applicationContext.getBeanNamesForAnnotation(annotation);
     }
 
     public static <T> T getBean(String className) {
