@@ -1,6 +1,5 @@
 package com.imagespace.quartz.model;
 
-import com.gss.quartz.common.QuartzUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.quartz.SimpleTrigger;
@@ -31,8 +30,9 @@ public class DefaultScheduleCriteria {
     }
 
     public String getInternalInSecondStr() {
-        return QuartzUtils.INSTANCE.formatMillSec(
-                (long) (this.internalInSecond * 1000));
+//        return QuartzUtils.INSTANCE.formatMillSec(
+//                (long) (this.internalInSecond * 1000));
+        return "";
     }
 
     public String getRepeatCountStr() {

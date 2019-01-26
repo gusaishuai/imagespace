@@ -1,7 +1,7 @@
 package com.imagespace.quartz.service;
 
-import com.gss.quartz.factory.model.QuartzUpdateCriteria;
 import com.imagespace.quartz.model.QuartzCriteria;
+import com.imagespace.quartz.model.QuartzUpdateCriteria;
 import com.imagespace.quartz.model.ScheduleType;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -11,7 +11,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author gusaishuai
  * @since 2017/3/28
  */
-public enum QuartzFactory {
+public enum QuartzSchedulerFactory {
 
     INSTANCE;
 

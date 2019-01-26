@@ -90,24 +90,24 @@ public class QuartzInitFactory {
                                     throw new IllegalArgumentException("定时任务必须启用一种类型的schedule");
                                 }
                                 //内存map，可用于查询定时任务
-                                QuartzCriteria quartzCriteria = QuartzMapFactory.INSTANCE
-                                        .putQuartzMap(clazz, method.getName(), startDate, quartz);
-                                log.info("quartz [" + quartzCriteria.getQuartzName() + "] put into quartzMap");
+//                                QuartzCriteria quartzCriteria = QuartzMapFactory.INSTANCE
+//                                        .putQuartzMap(clazz, method.getName(), startDate, quartz);
+//                                log.info("quartz [" + quartzCriteria.getQuartzName() + "] put into quartzMap");
                                 //增加定时任务
-                                QuartzSchedulerFactory.INSTANCE.addJob(quartzCriteria);
-                                log.info("quartz [" + quartzCriteria.getQuartzName() + "] put into scheduleJob");
+//                                QuartzSchedulerFactory.INSTANCE.addJob(quartzCriteria);
+//                                log.info("quartz [" + quartzCriteria.getQuartzName() + "] put into scheduleJob");
                             } catch (IllegalArgumentException e) {
                                 log.error("quartz [" + quartzName + "] can not init : " + e.getMessage());
                             } catch (Exception e) {
-                                log.error("quartz [" + quartzName + "] can not init : " + QuartzErrorTrace.getExceptionTrace(e));
+//                                log.error("quartz [" + quartzName + "] can not init : " + QuartzErrorTrace.getExceptionTrace(e));
                             }
                         }));
             });
             //项目中有对应的定时任务才启动
-            if (QuartzMapFactory.INSTANCE.hasQuartz()) {
-                QuartzSchedulerFactory.INSTANCE.startJob();
-                log.info("all quartz start ...");
-            }
+//            if (QuartzMapFactory.INSTANCE.hasQuartz()) {
+//                QuartzSchedulerFactory.INSTANCE.startJob();
+//                log.info("all quartz start ...");
+//            }
         } catch (IllegalArgumentException e) {
             log.error("定时任务初始化失败", e.getMessage());
         } catch (Exception e) {

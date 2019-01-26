@@ -1,7 +1,5 @@
 package com.imagespace.quartz.model;
 
-import com.gss.quartz.common.QuartzUtils;
-
 import java.util.Date;
 
 /**
@@ -49,11 +47,13 @@ public class QuartzExecuteDetailCriteria {
     }
 
     public String getExecuteDateStr() {
-        return QuartzUtils.INSTANCE.formatDateStr(this.executeDate);
+//        return QuartzUtils.INSTANCE.formatDateStr(this.executeDate);
+        return "";
     }
 
     public String getExecuteDurationStr() {
-        return QuartzUtils.INSTANCE.formatMillSec(this.executeDuration);
+//        return QuartzUtils.INSTANCE.formatMillSec(this.executeDuration);
+        return "";
     }
 
 }

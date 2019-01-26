@@ -1,7 +1,5 @@
 package com.imagespace.quartz.model;
 
-import com.gss.quartz.common.QuartzUtils;
-
 import java.util.Date;
 
 /**
@@ -49,7 +47,8 @@ public class QuartzScheduleCriteria {
     }
 
     public String getStartDateStr() {
-        return QuartzUtils.INSTANCE.formatDateStr(this.startDate);
+//        return QuartzUtils.INSTANCE.formatDateStr(this.startDate);
+        return "";
     }
 
     /**
