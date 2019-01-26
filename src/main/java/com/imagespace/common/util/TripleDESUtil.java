@@ -1,6 +1,5 @@
 package com.imagespace.common.util;
 
-import com.imagespace.common.model.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 
@@ -27,10 +26,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class TripleDESUtil {
 
     private static final String DEFAULT_ENCODE = "utf-8";
-
-    public static void main(String[] args) {
-        System.out.println(encrypt("1", Constant.TRIPLE_DES_KEY));
-    }
 
     public static String encrypt(String message, String key) {
         try {

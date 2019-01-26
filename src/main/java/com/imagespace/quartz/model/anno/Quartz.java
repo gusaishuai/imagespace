@@ -22,7 +22,7 @@ public @interface Quartz {
 
     /**
      * 开始时间，不写默认为立刻执行
-     * <br>格式:yyyy-MM-dd HH:mm:ss
+     * 格式:yyyy-MM-dd HH:mm:ss
      */
     String startDate() default "";
 

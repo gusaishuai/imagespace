@@ -6,7 +6,7 @@ CREATE TABLE `t_user` (
   `password` varchar(256) DEFAULT NULL COMMENT '密码',
   `nick` varchar(64) DEFAULT NULL COMMENT '昵称',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户信息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息';
 
 CREATE TABLE `t_menu` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -15,14 +15,14 @@ CREATE TABLE `t_menu` (
   `logo` varchar(64) DEFAULT NULL COMMENT 'logo',
   `sort` int(11) DEFAULT NULL COMMENT '排序，从小到大',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='菜单信息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='菜单信息';
 
 CREATE TABLE `t_user_menu` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_id` int(11) DEFAULT NULL COMMENT '用户ID',
   `menu_id` int(11) DEFAULT NULL COMMENT '菜单ID',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户菜单关系';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户菜单关系';
 
 CREATE TABLE `t_excel_filter_rule` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -30,7 +30,7 @@ CREATE TABLE `t_excel_filter_rule` (
   `user_id` int(11) DEFAULT NULL COMMENT '归属人员',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='EXCEL过滤规则';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='EXCEL过滤规则';
 
 CREATE TABLE `t_excel_filter_rule_detail` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -43,7 +43,7 @@ CREATE TABLE `t_excel_filter_rule_detail` (
   `conj` varchar(8) DEFAULT NULL COMMENT '连接符 &-并且 |-或者',
   PRIMARY KEY (`id`),
   KEY `idx_rule_id` (`rule_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='EXCEL过滤规则详细';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='EXCEL过滤规则详细';
 
 CREATE TABLE `t_quartz` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -56,7 +56,7 @@ CREATE TABLE `t_quartz` (
   `repeat_num` int(11) DEFAULT NULL COMMENT '重复次数',
   `status` tinyint(4) DEFAULT NULL COMMENT '状态',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='定时任务管理';
 
 
 ### `How to use lombok in idea`
