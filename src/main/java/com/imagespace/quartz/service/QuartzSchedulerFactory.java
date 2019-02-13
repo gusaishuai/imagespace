@@ -73,7 +73,7 @@ public enum QuartzSchedulerFactory {
             JobDetail jobDetail = JobBuilder.newJob(QuartzJob.class)
                     .withIdentity(quartzUpdateCriteria.getKey(), Scheduler.DEFAULT_GROUP)
                     .build();
-            ScheduleBuilder scheduleBuilder = null;
+            ScheduleBuilder<? extends Trigger> scheduleBuilder = null;
             if (quartzUpdateCriteria.getScheduleType() == ScheduleType.DEFAULT) {
                 scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
                         .withIntervalInSeconds(quartzUpdateCriteria.getDefaultSchedule().getInternalInSecond())

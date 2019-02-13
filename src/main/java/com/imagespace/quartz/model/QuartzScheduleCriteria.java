@@ -1,5 +1,7 @@
 package com.imagespace.quartz.model;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.util.Date;
 
 /**
@@ -47,8 +49,7 @@ public class QuartzScheduleCriteria {
     }
 
     public String getStartDateStr() {
-//        return QuartzUtils.INSTANCE.formatDateStr(this.startDate);
-        return "";
+        return DateFormatUtils.format(startDate, "yyyy-MM-dd HH:mm:ss");
     }
 
     /**

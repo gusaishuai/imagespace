@@ -1,9 +1,6 @@
 package com.imagespace.user.action;
 
-import com.imagespace.common.model.CallResult;
-import com.imagespace.common.model.Page;
-import com.imagespace.common.model.Pagination;
-import com.imagespace.common.model.ResultCode;
+import com.imagespace.common.model.*;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.user.model.User;
@@ -43,7 +40,7 @@ public class UserQueryAction implements ICallApi {
             //登录名
             String loginName = request.getParameter("loginName");
             //分页查询用户信息列表
-            Page<User> userPage = userService.queryUserByPage(loginName, new Pagination(pageNo, 15));
+            Page<User> userPage = userService.queryUserByPage(loginName, new Pagination(pageNo, Constant.PAGE_SIZE));
             //构建返回参数
             Page<UserVo> voPage = buildVo(userPage);
             return new CallResult(voPage);

@@ -6,6 +6,7 @@ import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.imagespace.common.model.Constant;
 import com.imagespace.common.model.Page;
 import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.excel.dao.ExcelFilterRuleDao;
@@ -64,7 +65,7 @@ public class ExcelServiceImpl implements ExcelService {
             String key = String.format("%s_%s_%s_%s", excel.getName(), sheetNum, topNum,
                     StringUtils.isBlank(expr) ? "" : DigestUtils.md5Hex(expr));
 
-            Page<Map<String, String>> excelModelPage = new Page<>(pageNo, 15);
+            Page<Map<String, String>> excelModelPage = new Page<>(pageNo, Constant.PAGE_SIZE);
             //缓存数据
             if (redisPool.keyExist(key)) {
                 excelModelPage.setTotalCount(redisPool.listLength(key));

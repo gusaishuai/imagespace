@@ -26,5 +26,9 @@ public class Constant {
      * 3DES秘钥
      */
     public static final String TRIPLE_DES_KEY = "fB&mjnUaF9vbAtBFvXwi3cbi";
+    /**
+     * 每页数量
+     */
+    public static final int PAGE_SIZE = 15;
 
 }

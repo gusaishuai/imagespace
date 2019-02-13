@@ -45,19 +45,6 @@ CREATE TABLE `t_excel_filter_rule_detail` (
   KEY `idx_rule_id` (`rule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='EXCEL过滤规则详细';
 
-CREATE TABLE `t_quartz` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `quartz_name` varchar(64) DEFAULT NULL COMMENT '定时任务名称',
-  `class_name` varchar(256) DEFAULT NULL COMMENT '类名',
-  `method_name` varchar(64) DEFAULT NULL COMMENT '方法名',
-  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
-  `cron_expression` varchar(64) DEFAULT NULL COMMENT 'CRON表达式',
-  `interval_time` int(11) DEFAULT NULL COMMENT '运行间隔',
-  `repeat_num` int(11) DEFAULT NULL COMMENT '重复次数',
-  `status` tinyint(4) DEFAULT NULL COMMENT '状态',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='定时任务管理';
-
 
 ### `How to use lombok in idea`
 

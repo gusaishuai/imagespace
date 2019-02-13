@@ -1,5 +1,8 @@
 package com.imagespace.quartz.model;
 
+import com.imagespace.quartz.util.IntervalUtil;
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.util.Date;
 
 /**
@@ -47,13 +50,11 @@ public class QuartzExecuteDetailCriteria {
     }
 
     public String getExecuteDateStr() {
-//        return QuartzUtils.INSTANCE.formatDateStr(this.executeDate);
-        return "";
+        return DateFormatUtils.format(executeDate, "yyyy-MM-dd HH:mm:ss");
     }
 
     public String getExecuteDurationStr() {
-//        return QuartzUtils.INSTANCE.formatMillSec(this.executeDuration);
-        return "";
+        return IntervalUtil.formatMillSec(executeDuration);
     }
 
 }

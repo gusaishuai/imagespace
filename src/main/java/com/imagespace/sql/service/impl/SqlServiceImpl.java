@@ -1,6 +1,7 @@
 package com.imagespace.sql.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.imagespace.common.model.Constant;
 import com.imagespace.common.model.Page;
 import com.imagespace.common.service.impl.RedisPool;
 import com.imagespace.sql.service.SqlService;
@@ -43,7 +44,7 @@ public class SqlServiceImpl implements SqlService {
     public Page<Map<String, Object>> select(String sql, int pageNo) {
         sql = StringUtils.trim(sql).split(";")[0];
         int totalCount = getTotalCount(sql);
-        Page<Map<String, Object>> execPage = new Page<>(pageNo, 15);
+        Page<Map<String, Object>> execPage = new Page<>(pageNo, Constant.PAGE_SIZE);
         execPage.setTotalCount(totalCount);
         List<Map<String, Object>> resultList;
         if (totalCount == 0) {
@@ -73,7 +74,7 @@ public class SqlServiceImpl implements SqlService {
     public Page<Map<String, Object>> update(String sql) {
         // 更新，包含插入、更新和删除
         int count = jdbcTemplate.update(StringUtils.trim(sql).split(";")[0]);
-        Page<Map<String, Object>> execPage = new Page<>(1, 15);
+        Page<Map<String, Object>> execPage = new Page<>(1, Constant.PAGE_SIZE);
         execPage.setTotalCount(1);
         Map<String, Object> map = new HashMap<>();
         map.put("count", count);

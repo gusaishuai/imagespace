@@ -5,9 +5,12 @@ import com.imagespace.common.model.Page;
 import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
+import com.imagespace.quartz.model.QuartzCriteria;
 import com.imagespace.quartz.model.vo.QuartzVo;
+import com.imagespace.quartz.service.QuartzMapFactory;
 import com.imagespace.user.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,33 +29,45 @@ public class QuartzQueryAction implements ICallApi {
     @Override
     public CallResult exec(User _user, HttpServletRequest request, HttpServletResponse response) {
         try {
+            //定时任务名称
             String quartzName = request.getParameter("quartzName");
+            //方法名
             String methodName = request.getParameter("methodName");
-            Page<QuartzVo> voPage = new Page<>(1, 15);
-            QuartzVo vo1 = new QuartzVo();
-            vo1.setQuartzName("定时任务1");
-            vo1.setClassName("com.aaa.Class");
-            vo1.setMethodName("methodName");
-            vo1.setStartTime("2019-01-19 15:10:17");
-            vo1.setIntervalTime("5秒");
-            vo1.setRepeatNum("无限次");
-            vo1.setStatus("开启");
+            //当前页数
+            String pageNoStr = request.getParameter("pageNo");
+            int pageNo = StringUtils.isBlank(pageNoStr) ? 1 : Integer.valueOf(pageNoStr);
+            Page<QuartzCriteria> quartzCriteriaPage = QuartzMapFactory.INSTANCE
+                    .queryQuartzMap(quartzName, methodName, pageNo);
 
-            QuartzVo vo2 = new QuartzVo();
-            vo2.setQuartzName("定时任务2");
-            vo2.setClassName("com.aaa.Class2");
-            vo2.setMethodName("methodName2");
-            vo2.setStartTime("2018-01-19 15:10:17");
-            vo2.setCronExpression("* * 12 ? * *");
-            vo2.setStatus("开启");
+            for (QuartzCriteria quartzCriteria : quartzCriteriaPage.getList()) {
+                QuartzVo vo = new QuartzVo();
+            }
+            return null;
 
-            List<QuartzVo> voList = new ArrayList<>();
-            voList.add(vo1);
-            voList.add(vo2);
-
-            voPage.setTotalCount(16);
-            voPage.setList(voList);
-            return new CallResult(voPage);
+//            QuartzVo vo1 = new QuartzVo();
+//            vo1.setQuartzName("定时任务1");
+//            vo1.setClassName("com.aaa.Class");
+//            vo1.setMethodName("methodName");
+//            vo1.setStartTime("2019-01-19 15:10:17");
+//            vo1.setIntervalTime("5秒");
+//            vo1.setRepeatNum("无限次");
+//            vo1.setStatus("开启");
+//
+//            QuartzVo vo2 = new QuartzVo();
+//            vo2.setQuartzName("定时任务2");
+//            vo2.setClassName("com.aaa.Class2");
+//            vo2.setMethodName("methodName2");
+//            vo2.setStartTime("2018-01-19 15:10:17");
+//            vo2.setCronExpression("* * 12 ? * *");
+//            vo2.setStatus("开启");
+//
+//            List<QuartzVo> voList = new ArrayList<>();
+//            voList.add(vo1);
+//            voList.add(vo2);
+//
+//            voPage.setTotalCount(16);
+//            voPage.setList(voList);
+//            return new CallResult(voPage);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
