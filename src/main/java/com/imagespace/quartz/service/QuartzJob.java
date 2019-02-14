@@ -28,12 +28,12 @@ public class QuartzJob implements Job {
             //开始日期
             Date startDate = Calendar.getInstance().getTime();
             long startMill = System.currentTimeMillis();
-            log.info("定时任务：{} 开始执行", quartzCriteria.getQuartzName());
+            log.info("【自动】定时任务：{} 开始执行", quartzCriteria.getQuartzName());
             //执行任务
             method.invoke(quartzCriteria.getClazz());
             //执行时长
             long duration = System.currentTimeMillis() - startMill;
-            log.info("定时任务：{} 结束执行", quartzCriteria.getQuartzName());
+            log.info("【自动】定时任务：{} 结束执行", quartzCriteria.getQuartzName());
             //本次执行的时间，这里就算上次执行时间了
             quartzCriteria.setPreExecuteDate(context.getScheduledFireTime());
             //下次执行的时间
@@ -41,7 +41,7 @@ public class QuartzJob implements Job {
             //加入定时任务执行历史
             quartzCriteria.addQuartzExecuteDetailListFIFO(startDate, duration, ExecuteType.AUTO);
         } catch (Exception e) {
-            log.error("定时任务：{} 执行失败", quartzCriteria == null ? "null" : quartzCriteria.getQuartzName(), e);
+            log.error("【自动】定时任务：{} 执行失败", quartzCriteria == null ? "null" : quartzCriteria.getQuartzName(), e);
         }
     }
 

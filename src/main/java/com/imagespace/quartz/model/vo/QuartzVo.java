@@ -44,4 +44,11 @@ public class QuartzVo {
      */
     private String status;
 
+    /**
+     * 作为修改、开启或关闭定时任务的id使用
+     */
+    public String getKey() {
+        return className + "." + methodName;
+    }
+
 }

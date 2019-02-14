@@ -6,6 +6,7 @@ import com.imagespace.common.model.ResultCode;
 import com.imagespace.common.service.ICallApi;
 import com.imagespace.common.util.ExceptionUtil;
 import com.imagespace.quartz.model.QuartzCriteria;
+import com.imagespace.quartz.model.ScheduleType;
 import com.imagespace.quartz.model.vo.QuartzVo;
 import com.imagespace.quartz.service.QuartzMapFactory;
 import com.imagespace.user.model.User;
@@ -38,36 +39,26 @@ public class QuartzQueryAction implements ICallApi {
             int pageNo = StringUtils.isBlank(pageNoStr) ? 1 : Integer.valueOf(pageNoStr);
             Page<QuartzCriteria> quartzCriteriaPage = QuartzMapFactory.INSTANCE
                     .queryQuartzMap(quartzName, methodName, pageNo);
-
+            Page<QuartzVo> voPage = new Page<>(quartzCriteriaPage.getPageNo(), quartzCriteriaPage.getPageSize());
+            voPage.setTotalCount(quartzCriteriaPage.getTotalCount());
+            List<QuartzVo> voList = new ArrayList<>();
             for (QuartzCriteria quartzCriteria : quartzCriteriaPage.getList()) {
                 QuartzVo vo = new QuartzVo();
+                vo.setQuartzName(quartzCriteria.getName());
+                vo.setClassName(quartzCriteria.getClassName());
+                vo.setMethodName(quartzCriteria.getMethodName());
+                vo.setStartTime(quartzCriteria.getStartDateStr());
+                if (quartzCriteria.getScheduleType() == ScheduleType.DEFAULT) {
+                    vo.setIntervalTime(quartzCriteria.getDefaultSchedule().getInternalInSecondStr());
+                    vo.setRepeatNum(quartzCriteria.getDefaultSchedule().getRepeatCountStr());
+                } else if (quartzCriteria.getScheduleType() == ScheduleType.CRON) {
+                    vo.setCronExpression(quartzCriteria.getCronSchedule().getExpression());
+                }
+                vo.setStatus(quartzCriteria.getOpenStr());
+                voList.add(vo);
             }
-            return null;
-
-//            QuartzVo vo1 = new QuartzVo();
-//            vo1.setQuartzName("定时任务1");
-//            vo1.setClassName("com.aaa.Class");
-//            vo1.setMethodName("methodName");
-//            vo1.setStartTime("2019-01-19 15:10:17");
-//            vo1.setIntervalTime("5秒");
-//            vo1.setRepeatNum("无限次");
-//            vo1.setStatus("开启");
-//
-//            QuartzVo vo2 = new QuartzVo();
-//            vo2.setQuartzName("定时任务2");
-//            vo2.setClassName("com.aaa.Class2");
-//            vo2.setMethodName("methodName2");
-//            vo2.setStartTime("2018-01-19 15:10:17");
-//            vo2.setCronExpression("* * 12 ? * *");
-//            vo2.setStatus("开启");
-//
-//            List<QuartzVo> voList = new ArrayList<>();
-//            voList.add(vo1);
-//            voList.add(vo2);
-//
-//            voPage.setTotalCount(16);
-//            voPage.setList(voList);
-//            return new CallResult(voPage);
+            voPage.setList(voList);
+            return new CallResult(voPage);
         } catch (IllegalArgumentException e) {
             return new CallResult(ResultCode.FAIL, e.getMessage());
         } catch (Exception e) {
